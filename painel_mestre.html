@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Mestre — Dark Souls RPG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital@0;1&display=swap');
+
+  :root{
+    --bg:#0c0b09;
+    --panel:#16130f;
+    --panel2:#1d1914;
+    --ink:#e8dcc4;
+    --muted:#9a8c74;
+    --line:#3a3026;
+    --ember:#d2842c;
+    --ember-bright:#f0a93f;
+    --blood:#7a2018;
+    --blood-bright:#b5392a;
+    --soul:#cfe3e6;
+    --soul-glow:#7fbcc4;
+    --ok:#6f8f4e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #1a1610 0%, transparent 60%),
+      radial-gradient(900px 500px at 50% 110%, #140f0a 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'EB Garamond', Georgia, serif;
+    min-height:100vh;
+    padding:28px 18px 60px;
+    background-attachment:fixed;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+  }
+  .wrap{max-width:1180px;margin:0 auto;position:relative;z-index:1}
+
+  header{text-align:center;margin-bottom:8px}
+  h1{
+    font-family:'Cinzel',serif;font-weight:900;letter-spacing:.14em;
+    font-size:clamp(22px,4vw,38px);color:var(--ink);
+    text-shadow:0 0 18px rgba(210,132,44,.25);
+  }
+  .sub{font-style:italic;color:var(--muted);letter-spacing:.04em;margin-top:4px;font-size:15px}
+  .ember-rule{
+    height:2px;width:230px;margin:16px auto 26px;
+    background:linear-gradient(90deg,transparent,var(--ember),transparent);
+    box-shadow:0 0 12px var(--ember);
+  }
+
+  /* combat bar */
+  .combatbar{
+    display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;
+    background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:26px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03), 0 8px 30px rgba(0,0,0,.5);
+  }
+  .combatbar .state{font-family:'Cinzel',serif;letter-spacing:.1em;font-size:14px;color:var(--muted)}
+  .combatbar .state b{color:var(--ember-bright)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+
+  .card{
+    position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:12px;padding:18px 18px 20px;
+    box-shadow:0 10px 34px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.03);
+    transition:border-color .3s, box-shadow .3s;
+  }
+  .card.bloodied{
+    border-color:var(--blood);
+    box-shadow:0 0 0 1px var(--blood), 0 0 26px rgba(181,57,42,.28), 0 10px 34px rgba(0,0,0,.6);
+  }
+  .card.dead{filter:grayscale(.85) brightness(.62);}
+  .card.dead::after{
+    content:"CAÍDO";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-12deg);
+    font-family:'Cinzel',serif;font-weight:900;font-size:40px;letter-spacing:.16em;
+    color:rgba(181,57,42,.55);text-shadow:0 2px 10px #000;pointer-events:none;
+  }
+
+  .cname{font-family:'Cinzel',serif;font-weight:700;font-size:21px;letter-spacing:.06em}
+  .cmeta{color:var(--muted);font-style:italic;font-size:13.5px;margin-top:1px;margin-bottom:12px}
+
+  /* position bar */
+  .posrow{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
+  .posrow .lbl{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.12em;color:var(--muted)}
+  .posval{font-family:'Cinzel',serif;font-size:19px}
+  .posval .cur{color:var(--ember-bright)}
+  .posval .max{color:var(--muted);font-size:14px}
+  .bar{height:16px;border:1px solid var(--line);border-radius:8px;background:#0a0805;overflow:hidden;position:relative}
+  .bar > i{
+    display:block;height:100%;width:100%;
+    background:linear-gradient(90deg,var(--blood-bright),var(--ember));
+    box-shadow:0 0 14px rgba(210,132,44,.5) inset;transition:width .35s ease;
+  }
+  .bloodied .bar > i{background:linear-gradient(90deg,#8c241b,var(--blood-bright));}
+  .bloodmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:rgba(232,220,196,.35);}
+
+  .btns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  button{
+    font-family:'EB Garamond',serif;cursor:pointer;border:1px solid var(--line);
+    background:#221c15;color:var(--ink);border-radius:7px;padding:6px 9px;font-size:14px;
+    transition:transform .08s, background .2s, border-color .2s;
+  }
+  button:hover{background:#2c241a;border-color:var(--ember)}
+  button:active{transform:translateY(1px)}
+  .dmg{color:#f0c0b6}.dmg:hover{border-color:var(--blood-bright)}
+  .heal{color:#cfe6c0}.heal:hover{border-color:var(--ok)}
+  .step{width:30px;text-align:center;padding:6px 0}
+  .amt{width:46px;text-align:center;background:#0a0805;border:1px solid var(--line);color:var(--ink);
+    border-radius:6px;font-family:'Cinzel',serif;font-size:14px;padding:5px 0}
+
+  .roll{
+    width:100%;margin-top:9px;font-family:'Cinzel',serif;letter-spacing:.08em;font-size:13px;
+    background:linear-gradient(180deg,#2a2117,#1c160f);color:var(--ember-bright);
+    border-color:#4a3a24;
+  }
+  .roll:hover{box-shadow:0 0 14px rgba(210,132,44,.3)}
+  .rollnote{font-size:12px;color:var(--muted);font-style:italic;margin-top:5px;min-height:16px;text-align:center}
+
+  .divider{height:1px;background:var(--line);margin:14px 0}
+
+  .statline{display:flex;justify-content:space-between;font-size:14px;margin:3px 0}
+  .statline .k{color:var(--muted)}
+  .ac b{color:var(--soul)}
+  .bloodied .ac .acnow{color:var(--ember-bright)}
+
+  .attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:8px}
+  .attr{background:#0a0805;border:1px solid var(--line);border-radius:6px;text-align:center;padding:5px 0}
+  .attr .an{font-size:10px;color:var(--muted);letter-spacing:.05em}
+  .attr .av{font-family:'Cinzel',serif;font-size:15px}
+  .attr .am{font-size:10px;color:var(--ember)}
+
+  .bloodtag{
+    display:inline-block;margin-top:10px;font-size:12px;font-style:italic;color:var(--muted);
+    border-left:2px solid var(--blood);padding-left:8px;line-height:1.35
+  }
+  .bloodtag.on{color:#e9b4ab;border-color:var(--blood-bright)}
+
+  /* souls + deaths */
+  .tracker{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+  .souls{flex:1}
+  .souls .lbl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+  .souls .row{display:flex;align-items:center;gap:5px;margin-top:3px}
+  .souls input{width:62px;background:#0a0805;border:1px solid var(--line);color:var(--soul);
+    border-radius:6px;font-family:'Cinzel',serif;font-size:13px;padding:4px 6px}
+  .souls .bank{font-size:12px;color:var(--soul-glow)}
+
+  .deaths{text-align:right}
+  .deaths .lbl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+  .pips{display:flex;gap:5px;justify-content:flex-end;margin-top:5px}
+  .pip{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);background:#0a0805;cursor:pointer;transition:.2s}
+  .pip.lit{background:radial-gradient(circle at 40% 35%,var(--blood-bright),var(--blood));
+    border-color:var(--blood-bright);box-shadow:0 0 9px rgba(181,57,42,.6)}
+  .pip.final{box-shadow:0 0 14px rgba(181,57,42,.9)}
+
+  .permadeath{color:var(--blood-bright);font-family:'Cinzel',serif;font-size:11px;
+    letter-spacing:.08em;text-align:right;margin-top:5px;min-height:14px}
+
+  .party-souls{
+    text-align:center;margin:24px auto 0;max-width:520px;background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:10px;padding:16px;
+  }
+  .party-souls h3{font-family:'Cinzel',serif;letter-spacing:.1em;font-size:15px;color:var(--soul);font-weight:600}
+  .party-souls .row{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .party-souls input{width:90px;background:#0a0805;border:1px solid var(--line);color:var(--soul);
+    border-radius:6px;font-family:'Cinzel',serif;font-size:15px;padding:6px 8px;text-align:center}
+  .party-souls .out{font-family:'Cinzel',serif;color:var(--ember-bright);font-size:16px}
+  .split{background:linear-gradient(180deg,#2a2117,#1c160f);color:var(--soul);border-color:#4a3a24}
+
+  .foot{text-align:center;color:var(--muted);font-style:italic;font-size:12.5px;margin-top:30px;line-height:1.6}
+  .reset{margin-top:14px;border-color:var(--blood);color:#e9b4ab}
+  .reset:hover{background:#241412;border-color:var(--blood-bright)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Painel do Mestre</h1>
+    <div class="sub">Dark Souls RPG · Sessão 1 — Undead Asylum · 4 Unkindled, nível 1</div>
+    <div class="ember-rule"></div>
+  </header>
+
+  <div class="combatbar">
+    <span class="state">Estado: <b id="combatState">Fora de combate</b></span>
+    <button id="combatBtn" class="roll" style="width:auto;margin:0">⚔ Iniciar combate (rolar Position temporária)</button>
+    <span class="state" style="font-size:12px">A Position temporária é rolada ao iniciar e zerada ao encerrar.</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="party-souls">
+    <h3>◈ Espólio do grupo — dividir almas por 4</h3>
+    <div class="row">
+      <span class="state" style="color:var(--muted)">Almas totais do inimigo:</span>
+      <input id="loot" type="number" value="0" min="0">
+      <button class="split" onclick="splitLoot()">Dividir ÷4</button>
+      <span class="out" id="lootOut">0 cada</span>
+    </div>
+    <div class="state" style="font-size:12px;color:var(--muted);margin-top:8px">
+      Aplica em "coletadas" de cada jogador. Lembre: almas <i>bancadas</i> nunca se perdem na morte.
+    </div>
+  </div>
+
+  <div class="foot">
+    Regra de Position (pág. 79): <b>máx do dado + mod CON + nível</b>.
+    Bloodied dispara a 50% da Position Base. Morte: 3 marcas consecutivas sem recuperar = permadeath.<br>
+    Reentrar na névoa do chefe enquanto o grupo luta reseta o chefe. Vitória do grupo recupera a marca em segurança.
+    <br>
+    <button class="reset" onclick="resetAll()">↺ Resetar painel (nova sessão)</button>
+  </div>
+</div>
+
+<script>
+// ---- DADOS TRAVADOS DOS 4 JOGADORES ----
+const BASE = [
+  { id:'drakar', name:'Drakar', meta:'Brute · Knight · O Sem Chama',
+    die:10, dieLabel:'1d10', con:14, level:1, posBase:13, acBase:15,
+    attrs:{FOR:15,DES:10,CON:14,INT:10,SAB:12,CAR:13},
+    bloodied:'Brute: +3 AC enquanto Bloodied.', bloodAC:3 },
+  { id:'elvyra', name:'Elvyra', meta:'Brute · Deprived · "Eu não os aquecerei"',
+    die:10, dieLabel:'1d10', con:14, level:1, posBase:13, acBase:10,
+    attrs:{FOR:16,DES:10,CON:14,INT:10,SAB:12,CAR:14},
+    bloodied:'Brute: +3 AC enquanto Bloodied.', bloodAC:3 },
+  { id:'marin', name:'Marin', meta:'Caster · Pyromancer · O Menino da Luz da Lua',
+    die:6, dieLabel:'1d6', con:10, level:1, posBase:7, acBase:13,
+    attrs:{FOR:10,DES:12,CON:10,INT:14,SAB:13,CAR:15},
+    bloodied:'Caster: +2 INT, +2 CAR e +2 AC; não provoca ataques de oportunidade.', bloodAC:2 },
+  { id:'zarkov', name:'Zarkov', meta:'Fencer · Assassin · O Velado',
+    die:8, dieLabel:'1d8', con:14, level:1, posBase:11, acBase:14,
+    attrs:{FOR:12,DES:15,CON:14,INT:13,SAB:10,CAR:10},
+    bloodied:'Fencer: +2 DES enquanto Bloodied.', bloodAC:0 },
+];
+
+function mod(v){const m=Math.floor((v-10)/2);return (m>=0?'+':'')+m;}
+
+let S = {}; // estado mutável por jogador
+function initState(){
+  S = {};
+  BASE.forEach(p=>{
+    S[p.id]={ cur:p.posBase, max:p.posBase, temp:0, deaths:0, dead:false,
+              collected:0, banked:0 };
+  });
+}
+initState();
+
+let inCombat=false;
+
+const grid=document.getElementById('grid');
+
+function render(){
+  grid.innerHTML='';
+  BASE.forEach(p=>{
+    const st=S[p.id];
+    const half=p.posBase/2;
+    const isBlood = !st.dead && st.cur<=half && st.cur>0;
+    const acNow = p.acBase + (isBlood?p.bloodAC:0);
+    const pct = Math.max(0, Math.min(100, (st.cur/st.max)*100));
+    const bloodPct = (half/st.max)*100;
+
+    const card=document.createElement('div');
+    card.className='card'+(isBlood?' bloodied':'')+(st.dead?' dead':'');
+    card.innerHTML=`
+      <div class="cname">${p.name}</div>
+      <div class="cmeta">${p.meta}</div>
+
+      <div class="posrow">
+        <span class="lbl">POSITION</span>
+        <span class="posval"><span class="cur">${st.cur}</span><span class="max"> / ${st.max}</span>${st.temp?` <span style="color:var(--soul-glow);font-size:13px">(+${st.temp} temp)</span>`:''}</span>
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i><span class="bloodmark" style="left:${bloodPct}%"></span></div>
+
+      <div class="btns">
+        <button class="dmg" onclick="dmg('${p.id}',5)">−5</button>
+        <button class="dmg step" onclick="dmg('${p.id}',1)">−1</button>
+        <input class="amt" id="amt-${p.id}" type="number" value="0" min="0">
+        <button class="dmg" onclick="dmgInput('${p.id}')">Dano</button>
+        <button class="heal step" onclick="dmg('${p.id}',-1)">+1</button>
+        <button class="heal" onclick="dmg('${p.id}',-5)">+5</button>
+        <button class="heal" onclick="full('${p.id}')">Cheio</button>
+      </div>
+      <button class="roll" onclick="rollTemp('${p.id}')">⚄ Rolar Position de combate (${p.level}${p.dieLabel.replace('1','×')})</button>
+      <div class="rollnote" id="note-${p.id}"></div>
+
+      <div class="divider"></div>
+
+      <div class="statline ac"><span class="k">Armour Class</span><span class="ac"><b class="acnow">${acNow}</b>${isBlood&&p.bloodAC?` <span style="color:var(--muted);font-size:12px">(base ${p.acBase})</span>`:''}</span></div>
+      <div class="statline"><span class="k">Position Base</span><b>${p.posBase}</b></div>
+
+      <div class="attrs">
+        ${Object.entries(p.attrs).map(([k,v])=>`<div class="attr"><div class="an">${k}</div><div class="av">${v}</div><div class="am">${mod(v)}</div></div>`).join('')}
+      </div>
+
+      <div class="bloodtag ${isBlood?'on':''}">${isBlood?'● BLOODIED ATIVO — ':''}${p.bloodied}</div>
+
+      <div class="tracker">
+        <div class="souls">
+          <div class="lbl">ALMAS</div>
+          <div class="row">
+            <span class="k" style="color:var(--muted);font-size:12px">colet.</span>
+            <input id="col-${p.id}" type="number" value="${st.collected}" min="0" onchange="setCol('${p.id}',this.value)">
+            <button onclick="bank('${p.id}')" title="Bancar (seguro)">⤓ banca</button>
+          </div>
+          <div class="bank">bancadas: ${st.banked}</div>
+        </div>
+        <div class="deaths">
+          <div class="lbl">MORTES</div>
+          <div class="pips">
+            ${[0,1,2].map(i=>`<span class="pip ${st.deaths>i?'lit':''} ${st.deaths>=3&&i===2?'final':''}" onclick="setDeath('${p.id}',${i+1})"></span>`).join('')}
+          </div>
+          <div class="permadeath">${st.deaths>=3?'✝ PERMADEATH':''}</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function dmg(id,amt){
+  const st=S[id];
+  st.cur=Math.max(0, Math.min(st.max, st.cur-amt));
+  if(st.cur===0 && !st.dead){ st.dead=true; st.deaths=Math.min(3,st.deaths+1); st.temp=0; }
+  if(st.cur>0) st.dead=false;
+  render();
+}
+function dmgInput(id){
+  const v=parseInt(document.getElementById('amt-'+id).value)||0;
+  dmg(id,v);
+}
+function full(id){ const st=S[id]; st.cur=st.max; st.dead=false; render(); }
+
+function rollTemp(id){
+  const p=BASE.find(x=>x.id===id); const st=S[id];
+  let total=0, rolls=[];
+  for(let i=0;i<p.level;i++){ const r=1+Math.floor(Math.random()*p.die); rolls.push(r); total+=r; }
+  st.temp=total; st.max=p.posBase+total; st.cur=st.max; st.dead=false;
+  render();
+  document.getElementById('note-'+id).textContent=`Rolou ${rolls.join(' + ')} = +${total} → Position de combate ${st.max}`;
+}
+
+function setCol(id,v){ S[id].collected=Math.max(0,parseInt(v)||0); }
+function bank(id){
+  const st=S[id];
+  const v=parseInt(document.getElementById('col-'+id).value)||0;
+  st.banked+=v; st.collected=0; render();
+}
+function setDeath(id,n){
+  const st=S[id];
+  st.deaths = (st.deaths===n)? n-1 : n; // clicar de novo no mesmo pip desfaz
+  render();
+}
+
+document.getElementById('combatBtn').onclick=function(){
+  inCombat=!inCombat;
+  document.getElementById('combatState').textContent = inCombat?'EM COMBATE':'Fora de combate';
+  this.textContent = inCombat?'⚑ Encerrar combate (zerar Position temporária)':'⚔ Iniciar combate (rolar Position temporária)';
+  if(inCombat){
+    BASE.forEach(p=>rollTemp(p.id));
+  }else{
+    BASE.forEach(p=>{ const st=S[p.id]; st.temp=0; st.max=p.posBase; st.cur=Math.min(st.cur,st.max);
+      document.getElementById('note-'+p.id) && (document.getElementById('note-'+p.id).textContent=''); });
+    render();
+  }
+};
+
+function splitLoot(){
+  const total=parseInt(document.getElementById('loot').value)||0;
+  const each=Math.floor(total/4);
+  BASE.forEach(p=>{ S[p.id].collected+=each; });
+  document.getElementById('lootOut').textContent=each+' cada';
+  render();
+}
+
+function resetAll(){
+  if(!confirm('Resetar todo o painel para o início de uma nova sessão? Position cheia, almas e mortes zeradas.')) return;
+  initState(); inCombat=false;
+  document.getElementById('combatState').textContent='Fora de combate';
+  document.getElementById('combatBtn').textContent='⚔ Iniciar combate (rolar Position temporária)';
+  document.getElementById('loot').value=0;
+  document.getElementById('lootOut').textContent='0 cada';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

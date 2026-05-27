@@ -1,0 +1,24 @@
+# JetBrains IDEs
+.idea/
+
+# PDFs com copyright (Steamforged Games) — não publicar
+DS RPG - EN.pdf
+DS RPG - PT.pdf
+*.pdf
+
+# Sistema operacional / editores
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Trilha sonora — MP3s de jogos FromSoftware (copyright + 98 MB)
+# Remova esta linha se quiser versionar localmente sem publicar no GitHub
+trilha_sonora_rpg/
+
+# Battle Maps — ~78 MB total. Descomente pasta a pasta conforme decidir.
+# Se quiser versionar imagens grandes, considere Git LFS antes.
+# Battle Maps/
+# Battle Maps/Majula/          # 3,9 MB — candidato a incluir
+# Battle Maps/Undead Burg Passage/  # 14 MB
+# Battle Maps/Undead Asylum/    # 24 MB
+# Battle Maps/Undead Burg/      # 36 MB
