@@ -14,14 +14,12 @@ Quatro origens disponíveis. Determinam stats base e dado de Position. (EN p.26�
 
 | Origem | Dado Position | Position Nv1 | Position Nv 2+ (progressão normal) | STR | DEX | CON | INT | WIS | CHA |
 |---|---|---|---|---|---|---|---|---|---|
-| **Brute** (Brutal) | 1d10 | 10 + CON | Base atual + CON mod | 15 (+2) | 10 (+0) | 14 (+2) | 10 (+0) | 12 (+1) | 13 (+1) |
-| **Fencer** (Espadachim) | 1d8 | 8 + CON | Base atual + CON mod | 12 (+1) | 15 (+2) | 14 (+2) | 13 (+1) | 10 (+0) | 10 (+0) |
-| **Jack of all Trades** (Coringa) | 1d8 | 8 + CON | Base atual + CON mod | 13 (+1) | 13 (+1) | 12 (+1) | 12 (+1) | 13 (+1) | 12 (+1) |
-| **Caster** (Conjurador) | 1d6 | 6 + CON | Base atual + CON mod | 10 (+0) | 12 (+1) | 10 (+0) | 14 (+2) | 13 (+1) | 15 (+2) |
+| **Brute** (Brutal) | 1d10 | 10 + CON + nível | Base atual + CON mod | 15 (+2) | 10 (+0) | 14 (+2) | 10 (+0) | 12 (+1) | 13 (+1) |
+| **Fencer** (Espadachim) | 1d8 | 8 + CON + nível | Base atual + CON mod | 12 (+1) | 15 (+2) | 14 (+2) | 13 (+1) | 10 (+0) | 10 (+0) |
+| **Jack of all Trades** (Coringa) | 1d8 | 8 + CON + nível | Base atual + CON mod | 13 (+1) | 13 (+1) | 12 (+1) | 12 (+1) | 13 (+1) | 12 (+1) |
+| **Caster** (Conjurador) | 1d6 | 6 + CON + nível | Base atual + CON mod | 10 (+0) | 12 (+1) | 10 (+0) | 14 (+2) | 13 (+1) | 15 (+2) |
 
 Velocidade base: 9 m (30 ft) para todas as origens.
-
-> Se a campanha começar em nível > 1, usar a fórmula de "Position at Higher Levels" de cada Origem (EN p.28–29): Brute = 1d10 (ou 6) + CON + nível após 1º; Fencer/Jack = 1d8 (ou 5) + CON + nível após 1º; Caster = 1d6 (ou 4) + CON + nível após 1º.
 
 ### Classes
 
@@ -123,11 +121,13 @@ Múltiplas criaturas: usa a DC da criatura de maior CR (empate: maior INT). Orde
 | Cast a Spell | conforme tempo de conjuração do spell |
 | Use an Object | interagir com um 2º objeto do turno |
 
+Todas as ações da tabela estão disponíveis a qualquer personagem em qualquer turno, independente de classe.
+
 **Reação:** 1 por rodada; recarrega no início do próximo turno. Ataque de oportunidade é o uso mais comum.
 
 **Crítico** (EN p.117): natural 20 → acerto automático independente de CA; dano total × 2.
 
-**Bonus action:** só disponível quando uma habilidade ou spell especifica "bonus action".
+**Bonus action** (EN p.112): só disponível quando uma habilidade de classe ou spell especifica explicitamente "bonus action". Sem essa especificação, não existe bonus action no turno.
 
 ### Movimento e posicionamento no grid
 
@@ -136,7 +136,7 @@ Múltiplas criaturas: usa a DC da criatura de maior CR (empate: maior INT). Orde
 - **Terreno difícil:** custa 2× o movimento por quadrado
 - **Prone (prostrado):** levantar custa metade da velocidade; ataques corpo a corpo contra você têm vantagem; ataques à distância têm desvantagem
 - **Ataque de oportunidade:** ao sair do alcance de um inimigo sem usar Disengage, o inimigo usa a reação para 1 ataque corpo a corpo (EN p.121)
-- Atravessar o espaço de uma criatura hostil: só se ela for 2 tamanhos maior ou menor
+- **Atravessar o espaço de uma criatura hostil** (EN p.114): RAW permite apenas se a criatura for ≥ 2 tamanhos diferente. O GM pode permitir em outros casos (ex.: passar por baixo de um inimigo grande) — se a criatura tiver reação disponível, pode usar ataque de oportunidade.
 - **Tamanhos no grid:** Tiny 0,75m², Small/Medium 1,5m², Large 3m², Huge 4,5m², Gargantuan 6m²+ (EN p.115)
 
 ### Cobertura (EN p.123)
@@ -149,11 +149,13 @@ Múltiplas criaturas: usa a DC da criatura de maior CR (empate: maior INT). Orde
 
 Apenas a maior cobertura se aplica; não somam entre si.
 
-### Ataques não-vistos / Backstab
+Cobertura **não penaliza** o atacante que está atrás dela — apenas beneficia a defesa. Um personagem em cobertura pode atacar com arco, spell ou qualquer outra ação normalmente.
 
-**RAW (EN p.119):** atacar alvo que não pode ver você → **vantagem** no ataque.
+### Flanqueamento e Ataques não-vistos
 
-**[HR] Mesa:** ataque de quem o alvo não vê = **crítico automático**. Sobrescreve o RAW de vantagem. *(Confirmado na Sessão 01)*
+**Flanqueamento em combate** (RAW, EN p.119): quando um aliado está na frente do inimigo e outro está nas costas, o atacante nas costas ganha **vantagem** no ataque.
+
+**[HR] Ataque não-visto fora de combate:** ataque feito antes de o combate iniciar, com o alvo completamente sem noção da presença do atacante = **crítico automático**. Diferente do flanqueamento — aqui o alvo não tem nenhuma ciência do perigo.
 
 ### Gasto de Position em manobras
 
@@ -210,7 +212,7 @@ Ao chegar a 0 de Position: morte → reaparece na fogueira mais próxima com Bas
 
 **Hollowing (RAW):** ao respawnar, save **WIS DC 18** — falha = rola 1d20 na tabela de Hollowing (EN p.99), com efeitos como perda de atributos, desvantagem em rolagens, etc. Purging Stone (1.000 almas) remove um efeito de Hollowing.
 
-**Rejoin boss fight (RAW):** ao reentrar em combate depois de morrer e respawnar, o boss **recupera toda a Position** — apenas o boss, não os aliados.
+**Rejoin boss fight (RAW):** ao reentrar em combate depois de morrer e respawnar, o boss **recupera toda a Position** (apenas o boss, não os aliados).
 
 ### [HR] Regra da mesa (Sessão 0)
 
@@ -228,10 +230,10 @@ A mesa **substitui completamente** o sistema RAW — sem Hollowing, sem falha po
 - **3 mortes consecutivas** sem recuperar → personagem cai no **abismo espiritual** (permadeath)
 
 **Boss e névoa:**
-- **[HR] vs RAW:** reentrar na névoa enquanto o boss ainda está vivo → boss **reseta completamente** (Position cheia, Fase 1). O livro RAW apenas faz o boss recuperar Position.
+- **Boss reset:** RAW (EN p.99) — reentrar na névoa faz o boss **recuperar toda a Position**. O GM avaliará durante a campanha se também reseta para Fase 1 conforme o contexto (ex.: boss em Fase 2 com Position cheia é mais perigoso que o RAW prevê).
 - Grupo **vence** o boss enquanto você está morto → névoa cai, você entra e recupera a marca de sangue em segurança; contador = 0
 
-**TPK (todos caem):** conta 1 morte para todos; todos perdem o lote de almas; contador de todos vai para **2**.
+**TPK (todos caem):** conta 1 morte para todos; almas coletadas de todos são **perdidas sem marca de sangue**; contador de todos vai para **1**.
 
 **[HR] vs RAW:** a mesa ignora a regra do livro de "mais de metade do grupo morto = falha de grupo".
 
@@ -272,11 +274,9 @@ Ao matar inimigo: cada personagem recebe **parcela igual** das almas. Level up: 
 | **Escudo Alvo** | Escudo Pequeno · +1 CA | Ao sofrer dano pela 1ª vez no combate, gastar 2 Position para reação de defesa | 200 almas |
 | **Armadura Assassina** | CA 12 + mod DEX | Com vantagem em ataque à distância/furtividade: +1d6 de dano no acerto | 850 almas |
 
-### Carregar, empurrar, arrastar
+### Carregar, empurrar, arrastar (EN p.150)
 
-**[HR] Mesa:** limite de **30× Força** para empurrar, arrastar ou levantar objetos.
-
-> Pendência: regra de encumbrance do livro em EN p.150 não verificada. Confirmar se há divergência com o RAW.
+Regra base do livro aplicada. O GM usa bom senso ou pede rolagem quando o objeto for excepcionalmente pesado ou a situação for ambígua.
 
 ### Parry (EN p.122)
 
@@ -338,11 +338,10 @@ Níveis 11–20: 20.000 a 50.000 almas (ver tabela completa EN p.130).
 
 Lista de todas as houserules da mesa para revisão rápida. Links apontam para a seção detalhada.
 
-- **[HR] Backstab / Ataques não-vistos:** ataque de quem o alvo não vê = crítico automático (RAW: vantagem). → [§ Ataques não-vistos](#ataques-não-vistos--backstab)
+- **[HR] Ataque não-visto fora de combate:** ataque com alvo sem noção da presença do atacante (antes do combate iniciar) = crítico automático. Flanqueamento em combate = vantagem (RAW). → [§ Flanqueamento e Ataques não-vistos](#flanqueamento-e-ataques-não-vistos)
 - **[HR] Morte — sem Hollowing:** mesa não usa a tabela de Hollowing nem o save WIS DC 18 ao respawnar. → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
 - **[HR] Morte — contador individual:** 3 mortes consecutivas sem recuperar a alma = permadeath. → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
-- **[HR] Morte — boss reset completo:** reentrar névoa reseta boss a Fase 1 completa (RAW: boss apenas recupera Position). → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
+- **[HR] Morte — boss reset:** a ser avaliado pelo GM por combate; RAW é o boss recuperar Position. → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
 - **[HR] Morte — sem falha de grupo:** mesa ignora a regra "mais de metade morto = falha". → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
-- **[HR] Morte — TPK:** conta 1 morte para todos, contador vai para 2. → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
-- **[HR] Carregamento:** 30× Força para empurrar/arrastar/levantar (RAW EN p.150 não verificado). → [§ Carregar, empurrar, arrastar](#carregar-empurrar-arrastar)
+- **[HR] Morte — TPK:** conta 1 morte para todos, almas perdidas sem marca, contador vai para 1. → [§ Morte · HR](#hr-regra-da-mesa-sessão-0)
 - **[HR] Parry — versão avançada:** pendente de definição. Em uso: RAW (+2 CA como reação). → [§ Parry](#parry-en-p122)
