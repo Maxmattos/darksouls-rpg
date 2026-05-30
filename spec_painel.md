@@ -64,6 +64,14 @@ Duas camadas complementares:
       "origem": "string",
       "nivel": "int",
       "con_mod": "int",
+      "atributos": {
+        "str": "int",
+        "dex": "int",
+        "con": "int",
+        "int": "int",
+        "wis": "int",
+        "cha": "int"
+      },
       "base_position": "int",
       "position_atual": "int",
       "estus_atual": "int",
@@ -106,6 +114,7 @@ Duas camadas complementares:
 - Inimigo sem `bestiario_ref` correspondente: painel exibe placeholder com alerta — não quebra.
 - Inimigo com fases: ao `position_atual` cruzar `bloodied_em` (descendo), `fase_atual` avança automaticamente; ao subir de volta, NÃO regride (decisão narrativa do mestre).
 - Stats estáticos (ac, atributos, ações, traços) vêm do bestiário via lookup; estado dinâmico é só o que está no schema acima.
+- Atributos base ficam imutáveis no schema. Bônus de Bloodied são calculados em tempo de render, não persistidos. Quando PC entra em Bloodied, valores derivados (modificador, AC efetiva) são recomputados e exibidos com destaque visual.
 
 ### Exemplo preenchido — sessão 1, nível 1, combate inativo
 
@@ -124,6 +133,7 @@ Duas camadas complementares:
       "origem": "Caster",
       "nivel": 1,
       "con_mod": 0,
+      "atributos": { "str": 10, "dex": 12, "con": 10, "int": 14, "wis": 13, "cha": 15 },
       "base_position": 7,
       "position_atual": 7,
       "estus_atual": 3,
@@ -142,6 +152,7 @@ Duas camadas complementares:
       "origem": "Fencer",
       "nivel": 1,
       "con_mod": 2,
+      "atributos": { "str": 12, "dex": 15, "con": 14, "int": 13, "wis": 10, "cha": 10 },
       "base_position": 11,
       "position_atual": 11,
       "estus_atual": 3,
@@ -160,6 +171,7 @@ Duas camadas complementares:
       "origem": "Brute",
       "nivel": 1,
       "con_mod": 2,
+      "atributos": { "str": 15, "dex": 10, "con": 14, "int": 10, "wis": 12, "cha": 13 },
       "base_position": 13,
       "position_atual": 13,
       "estus_atual": 3,
@@ -178,6 +190,7 @@ Duas camadas complementares:
       "origem": "Brute",
       "nivel": 1,
       "con_mod": 2,
+      "atributos": { "str": 16, "dex": 10, "con": 14, "int": 10, "wis": 12, "cha": 14 },
       "base_position": 13,
       "position_atual": 13,
       "estus_atual": 3,
@@ -275,6 +288,19 @@ Três seções verticais:
 | Retornar ao combate | `status = "vivo"`; se `combate.ativo`, abre entrada de pool temporário para esse PC |
 | Beber Estus | `estus_atual--` (mín 0); `position_atual = min(teto, position_atual + floor(base_position / 2))` onde `teto = combate.ativo ? base_position + pool_inicial_combate[id] : base_position` |
 
+### Exibição de atributos no card
+
+Atributos sempre visíveis no card (linha compacta no topo). Quando PC entra em Bloodied:
+- Atributos afetados (ex: DEX pro Fencer) exibidos como `15 → 17` em **cor amarela** (`#c9a84c` — dourado da paleta).
+- Atributos não afetados permanecem em cor normal.
+- AC também exibida; se afetada por Bloodied, mesma transição visual (ex: `12 → 14` amarelo).
+- Modificadores recalculados implicitamente; o painel não precisa exibir mod separadamente — exibir só o valor final do atributo basta pro jogador calcular.
+
+**Estado visual do card:**
+- Vivo, fora de combate: aparência normal (paleta padrão).
+- Vivo, em Bloodied: card com fundo laranja-brasa (`#c94f1e` translúcido). Atributos afetados em amarelo (`15 → 17`). Abaixo do badge, listar os efeitos textuais (`tipo='texto'`) como bullet points.
+- Status `morto_aguardando_respawn`: card todo em escala de cinza, com texto sobreposto 'YOU DIED' em vermelho-sangue (`#8b0000`), fonte serifada, grande. Botões de ação do card permanecem acessíveis para o mestre.
+
 ### Seção de inimigos
 
 Cada inimigo é renderizado como card expansível. Cabeçalho (sempre visível):
@@ -298,6 +324,14 @@ Corpo do card (colapsável, padrão expandido durante combate):
 - Botão "Mostrar narrativa" (abre overlay com texto narrativo do bestiário pra ler em voz alta)
 
 Ação global: **+ Adicionar do bestiário** abre modal com lista de bestiário; selecionar instancia um inimigo no estado. (v1 pode ser dropdown simples; UI rica fica pra v2.)
+
+**Estado visual do card:**
+- Vivo, fora de Bloodied: aparência normal.
+- Vivo, em Bloodied (`position_atual ≤ bloodied_em`): fundo laranja-brasa + descrição da fase atual (`fases[fase_atual].regra`) exibida abaixo do badge.
+- `position_atual == 0`: fundo vermelho intenso (`#5a0000`). Card permanece na lista. Remoção é manual — não é automática. Justificativa: criaturas com 'Keeps Crawling On' (Hollow Soldier) podem retornar a 1 Position via CON save; remover automaticamente quebraria a mecânica.
+- Botão de remoção rápida (X) no canto superior direito, sempre visível. Comportamento:
+  - Inimigo vivo (`position_atual > 0`): X dispara modal de confirmação.
+  - Inimigo a 0 Position: X remove direto, sem confirmação.
 
 ### Controles de combate
 
@@ -346,6 +380,11 @@ Ação global: **+ Adicionar do bestiário** abre modal com lista de bestiário;
 
 Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e coloridos — não apenas texto pequeno.
 
+**Estado visual do card:**
+- Bloodied: fundo laranja-brasa + atributos afetados em amarelo (mesma formatação da vista mestre) + lista de efeitos textuais abaixo do badge. Jogador vê o benefício e usa ativamente, com destaque pros atributos que mudaram.
+- Morto aguardando respawn: card todo em escala de cinza, com texto sobreposto 'YOU DIED' em vermelho-sangue (`#8b0000`), fonte serifada, grande.
+- Inimigos não aparecem nesta vista (independente de estado).
+
 ### Responsividade
 
 - **1080p**: 4 cards em linha ou 2×2
@@ -363,6 +402,7 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 | Exportar JSON | Botão sempre visível; download de blob com nome `rpg_ds_YYYY-MM-DD.json` |
 | Carregar JSON | Botão na vista mestre; abre input de arquivo; sobrescreve estado atual com confirmação |
 | Carga do bestiário | Na inicialização, painel faz fetch de `bestiario.json` (mesma pasta). Se falhar, exibe alerta e usa fallback vazio. Bestiário NÃO entra em localStorage — sempre lido do arquivo. |
+| Carga de bloodied_origens.json | Inicialização: fetch do JSON da mesma pasta. Falha exibe alerta; cards em Bloodied mostram só fundo laranja sem detalhe de efeitos. |
 
 ---
 
@@ -415,3 +455,6 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 - [ ] Estética Dark Souls aplicada na vista jogadores; legível a 2–3 m em 1080p
 - [ ] `bestiario.json` é carregado no startup; falha exibe alerta sem quebrar painel
 - [ ] Os 4 inimigos da sessão 1 (3 Hollow Soldiers + Asylum Demon) aparecem pré-populados ao abrir o painel pela primeira vez (estado vazio)
+- [ ] bloodied_origens.json carrega; cards em Bloodied mostram efeitos da origem
+- [ ] Atributos afetados ficam amarelos com transição `15 → 17` visível
+- [ ] AC em Bloodied (Brute, Caster, Jack) também mostra transição visual

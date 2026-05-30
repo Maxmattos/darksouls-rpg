@@ -1,0 +1,33 @@
+{
+  "Brute": {
+    "efeitos": [
+      { "tipo": "ac", "delta": 3, "descricao": "+3 em AC" },
+      { "tipo": "texto", "descricao": "Vantagem em testes e saving throws de Força" },
+      { "tipo": "texto", "descricao": "Reduz todo dano recebido em 2 pontos" }
+    ]
+  },
+  "Fencer": {
+    "efeitos": [
+      { "tipo": "atributo", "alvo": "dex", "delta": 2, "descricao": "+2 no atributo Destreza" },
+      { "tipo": "texto", "descricao": "Uma reação adicional por turno" },
+      { "tipo": "texto", "descricao": "Reduz o custo de Position de ataques corpo-a-corpo em 1" }
+    ]
+  },
+  "Caster": {
+    "efeitos": [
+      { "tipo": "atributo", "alvo": "int", "delta": 2, "descricao": "+2 no atributo Inteligência" },
+      { "tipo": "atributo", "alvo": "cha", "delta": 2, "descricao": "+2 no atributo Carisma" },
+      { "tipo": "ac", "delta": 2, "descricao": "+2 em AC" },
+      { "tipo": "texto", "descricao": "Usa habilidade especial de arma equipada sem gastar Position" },
+      { "tipo": "texto", "descricao": "Não provoca ataques de oportunidade" }
+    ]
+  },
+  "Jack of all Trades": {
+    "efeitos": [
+      { "tipo": "atributo", "alvo": "wis", "delta": 2, "descricao": "+2 no atributo Sabedoria" },
+      { "tipo": "ac", "delta": 2, "descricao": "+2 em AC" },
+      { "tipo": "texto", "descricao": "Vantagem em saving throws contra magia" },
+      { "tipo": "texto", "descricao": "Remove uma condição negativa à escolha" }
+    ]
+  }
+}

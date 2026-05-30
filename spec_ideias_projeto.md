@@ -22,6 +22,9 @@ Atualizar conforme o projeto avança.
 - [x] Vista jogadores: estética Dark Souls, legível a 2–3 m em 1080p
 - [x] Bloodied calculado e exibido em ambas as vistas (somente em combate)
 - [x] Edge cases documentados: TPK, segunda morte, PC ausente em combate, etc.
+- [x] Bloodied effects por origem (estrutura tipada em bloodied_origens.json)
+- [x] Atributos base dos PCs no schema
+- [x] Destaque visual de atributos afetados por Bloodied (15 → 17)
 
 ### Implementado
 

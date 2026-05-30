@@ -77,14 +77,18 @@ Após o combate, Position reverte à Base Position ou ao valor atual, o que for 
 
 ### Bloodied (Ensanguentado)
 
-Gatilho: Position de combate ≤ 50% do pool inicial do combate atual. Só ativa em combate. Se curado acima do limiar, os efeitos cessam. (EN p.124)
+Estado disparado quando `position_atual ≤ 50% do pool inicial de combate`. RAW: só ativo em combate (livro EN p.124).
 
-| Origem | Efeitos ao ficar Bloodied |
-|---|---|
-| **Brute** | +3 CA; vantagem em todos os testes e saves de Força; reduz todo dano recebido em 2 |
-| **Fencer** | +2 Destreza; uma reação adicional por turno; reduz custo de Position de armas corpo a corpo em 1 |
-| **Jack of all Trades** | +2 Sabedoria e CA; vantagem em saves contra ataques mágicos; remove uma condição negativa à escolha |
-| **Caster** | +2 Inteligência, Carisma e CA; usa habilidade especial da arma equipada sem gastar Position; não provoca ataques de oportunidade enquanto Bloodied |
+Cada origem tem um conjunto fixo de benefícios em Bloodied (EN p.28-29):
+
+- **Brute**: +3 AC · vantagem em testes/saves de Força · reduz dano em 2
+- **Fencer**: +2 DEX (atributo) · 1 reação adicional/turno · custo Position melee −1
+- **Caster**: +2 INT, +2 CHA (atributos), +2 AC · habilidade especial de arma sem custo · imune a AoO
+- **Jack of all Trades**: +2 SAB (atributo), +2 AC · vantagem contra magia · remove uma condição
+
+**Importante:** bônus em atributo somam direto no valor do atributo (ex: DEX 15 → 17), não no modificador. Modificador e derivados (ataque, AC, iniciativa, saves) são recalculados quando Bloodied ativa, e revertidos quando sai.
+
+Inimigos: cada criatura define seu Bloodied effect no stat block (ver bestiario.json). Criaturas com fases (ex.: Asylum Demon) usam Bloodied como gatilho de transição de fase. Estrutura tipada dos efeitos: ver bloodied_origens.json.
 
 ---
 
