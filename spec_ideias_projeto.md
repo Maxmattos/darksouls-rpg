@@ -54,6 +54,20 @@ Itens fora do escopo da sessão 1. Priorizar antes da sessão em que forem neces
 
 ---
 
+### Bestiário — UI rica de seleção
+
+**Contexto:** v1 carrega `bestiario.json` e pré-popula inimigos da sessão 1 no estado inicial. Adicionar novos inimigos durante a sessão funciona via JSON manual ou "+ Adicionar do bestiário" simples.
+
+**Comportamento desejado:**
+- Modal de busca com filtros (CR, tipo, tags como "undead", "demon", "boss")
+- Preview do stat block antes de instanciar
+- Sugestões de encontros balanceados por CR do grupo
+- Editor in-place do bestiário (sem editar JSON manualmente)
+
+**Prioridade:** quando o bestiário tiver 10+ entradas.
+
+---
+
 ### Spell tracking por PC caster
 
 **Contexto:** Marin (Pyromancer) tem attunement slots e casts por spell. Por decisão da v1, spell tracking fica fora do painel. Razões:

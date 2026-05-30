@@ -79,9 +79,12 @@ Duas camadas complementares:
   "inimigos": [
     {
       "id": "string",
-      "nome": "string",
-      "position_max": "int",
+      "bestiario_ref": "string (chave em bestiario.json)",
+      "nome_exibicao": "string (default = bestiario[ref].nome; mestre pode customizar)",
+      "arma_equipada": "string | null (só pra inimigos com armas_disponiveis)",
       "position_atual": "int",
+      "position_max": "int (default = bestiario[ref].position_max; editável)",
+      "fase_atual": "int | null (só pra inimigos com fases; default = 1)",
       "nota": "string"
     }
   ],
@@ -100,6 +103,9 @@ Duas camadas complementares:
 - `pool_inicial_combate` é vazio `{}` quando `combate.ativo == false`. Ao iniciar combate, só PCs com `status == "vivo"` recebem entrada.
 - `pool_inicial_combate[pc_id]` é imutável durante o combate — usado para o limiar de Bloodied e para exibição de "Position temporária" nas vistas.
 - Bloodied (Mecanicas.md §1): só calculado quando `combate.ativo == true`. Limiar = `pool_inicial_combate[pc_id] × 0.5`. Ativo quando `position_atual ≤ limiar`.
+- Inimigo sem `bestiario_ref` correspondente: painel exibe placeholder com alerta — não quebra.
+- Inimigo com fases: ao `position_atual` cruzar `bloodied_em` (descendo), `fase_atual` avança automaticamente; ao subir de volta, NÃO regride (decisão narrativa do mestre).
+- Stats estáticos (ac, atributos, ações, traços) vêm do bestiário via lookup; estado dinâmico é só o que está no schema acima.
 
 ### Exemplo preenchido — sessão 1, nível 1, combate inativo
 
@@ -186,11 +192,44 @@ Duas camadas complementares:
   ],
   "inimigos": [
     {
-      "id": "asylum_demon",
-      "nome": "Asylum Demon",
-      "position_max": 60,
+      "id": "hs_1",
+      "bestiario_ref": "hollow_soldier",
+      "nome_exibicao": "Hollow Soldier — Espada",
+      "arma_equipada": "Espada Enferrujada",
+      "position_atual": 22,
+      "position_max": 22,
+      "fase_atual": null,
+      "nota": ""
+    },
+    {
+      "id": "hs_2",
+      "bestiario_ref": "hollow_soldier",
+      "nome_exibicao": "Hollow Soldier — Alabarda",
+      "arma_equipada": "Alabarda",
+      "position_atual": 22,
+      "position_max": 22,
+      "fase_atual": null,
+      "nota": ""
+    },
+    {
+      "id": "hs_3",
+      "bestiario_ref": "hollow_soldier",
+      "nome_exibicao": "Hollow Soldier — Besta",
+      "arma_equipada": "Besta Leve",
+      "position_atual": 22,
+      "position_max": 22,
+      "fase_atual": null,
+      "nota": ""
+    },
+    {
+      "id": "asd_1",
+      "bestiario_ref": "asylum_demon_tutorial",
+      "nome_exibicao": "Asylum Demon",
+      "arma_equipada": null,
       "position_atual": 60,
-      "nota": "Fase 2 (Bloodied ≤30): multiataque. Resistência a Magia."
+      "position_max": 60,
+      "fase_atual": 1,
+      "nota": ""
     }
   ],
   "combate": {
@@ -238,16 +277,27 @@ Três seções verticais:
 
 ### Seção de inimigos
 
+Cada inimigo é renderizado como card expansível. Cabeçalho (sempre visível):
+
 | Campo | Modo |
 |---|---|
-| Nome | editável |
-| Position atual / máxima | dois campos editáveis; exibidos como `atual / max` |
-| Nota | texto livre editável |
+| Nome exibição | editável |
+| Position atual / máx | editável (formato `X / Y`) |
+| Fase atual | exibição + ação (botão "Avançar fase" / "Voltar fase") |
+| Bloodied badge | derivado, acende quando `position_atual ≤ bloodied_em` |
+| Remover | botão com confirmação |
 
-Ação global: **+ Adicionar inimigo** (cria entrada com valores zerados).
-Ação por inimigo: **Remover** (com confirmação).
+Corpo do card (colapsável, padrão expandido durante combate):
 
-*Position máxima dos inimigos é visível somente na vista mestre.*
+- Atributos e AC (vindos do bestiário)
+- Resistências / imunidades (vindos do bestiário)
+- Traços (lista do bestiário)
+- Ações disponíveis (lista do bestiário, com seletor de arma quando o inimigo tem `armas_disponiveis`)
+- Fases (lista do bestiário, com `fase_atual` destacada)
+- Nota livre (editável, persistida no estado)
+- Botão "Mostrar narrativa" (abre overlay com texto narrativo do bestiário pra ler em voz alta)
+
+Ação global: **+ Adicionar do bestiário** abre modal com lista de bestiário; selecionar instancia um inimigo no estado. (v1 pode ser dropdown simples; UI rica fica pra v2.)
 
 ### Controles de combate
 
@@ -309,9 +359,10 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 |---|---|
 | Auto-save | Cada mudança de estado serializa JSON em `localStorage["rpg_ds_state"]` |
 | Auto-resume | Ao abrir `?view=master`: lê `localStorage["rpg_ds_state"]`; se presente, carrega sem fricção |
-| Estado ausente | Inicia com os 4 PCs da campanha pré-populados (stats no schema de exemplo §3), inimigos vazio, combate inativo |
+| Estado ausente | Inicia com os 4 PCs da campanha pré-populados (stats em §3) e os inimigos da sessão 1 pré-populados (3 Hollow Soldiers + Asylum Demon, refs em bestiario.json), combate inativo |
 | Exportar JSON | Botão sempre visível; download de blob com nome `rpg_ds_YYYY-MM-DD.json` |
 | Carregar JSON | Botão na vista mestre; abre input de arquivo; sobrescreve estado atual com confirmação |
+| Carga do bestiário | Na inicialização, painel faz fetch de `bestiario.json` (mesma pasta). Se falhar, exibe alerta e usa fallback vazio. Bestiário NÃO entra em localStorage — sempre lido do arquivo. |
 
 ---
 
@@ -339,7 +390,6 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 
 - Fogueira como entidade gerenciável no painel
 - Rastreamento de iniciativa / ordem de turno
-- Spell tracking individual por PC
 - Level up automatizado (backlog — ver `spec_ideias_projeto.md`)
 - Acesso de jogadores por dispositivo próprio
 - Login, autenticação, servidor
@@ -363,3 +413,5 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 - [ ] Carregar JSON funcional (com confirmação ao sobrescrever)
 - [ ] Vista jogadores não exibe inimigos nem controles
 - [ ] Estética Dark Souls aplicada na vista jogadores; legível a 2–3 m em 1080p
+- [ ] `bestiario.json` é carregado no startup; falha exibe alerta sem quebrar painel
+- [ ] Os 4 inimigos da sessão 1 (3 Hollow Soldiers + Asylum Demon) aparecem pré-populados ao abrir o painel pela primeira vez (estado vazio)

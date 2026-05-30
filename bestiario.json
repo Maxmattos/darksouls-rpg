@@ -1,0 +1,71 @@
+{
+  "asylum_demon_tutorial": {
+    "nome": "Asylum Demon",
+    "variacao": "versão tutorial (nível 1)",
+    "tipo": "Chefe · Demônio Grande",
+    "position_max": 60,
+    "bloodied_em": 30,
+    "ac": 14,
+    "velocidade_m": 9,
+    "iniciativa": "Sempre age primeiro",
+    "visao_no_escuro_m": 36,
+    "atributos": { "str": 3, "dex": 2, "con": 2, "int": -1, "wis": 0, "cha": 0 },
+    "saves": { "str": 5, "con": 4, "wis": 2 },
+    "imunidades_dano": ["veneno"],
+    "resistencias_dano": ["fogo", "frio"],
+    "imunidades_condicao": ["envenenado", "enfeitiçado", "inconsciente", "agarrado"],
+    "almas": 1800,
+    "tracos": [
+      { "nome": "Visão Demoníaca", "efeito": "Escuridão mágica não atrapalha sua visão." },
+      { "nome": "Resistência à Magia", "efeito": "Vantagem em saves contra magia." }
+    ],
+    "fases": [
+      { "id": 1, "nome": "Peso do Martelo", "gatilho": "Position 60→31", "regra": "Um ataque por turno." },
+      { "id": 2, "nome": "Fúria", "gatilho": "Bloodied (≤30)", "regra": "Multiataque: Pancada do Chão + Investida de Martelo no mesmo turno." }
+    ],
+    "acoes": [
+      {
+        "nome": "Pancada no Chão",
+        "tipo": "área",
+        "alcance": "cone 4,5m à frente",
+        "save": "CON DC 12",
+        "efeito": "Falha: 9 (2d6+2) contundente + prone, velocidade -3m até o próximo turno do demônio. Sucesso: metade do dano.",
+        "telegrafe": "Descreva o martelo se erguendo no fim do turno anterior."
+      },
+      {
+        "nome": "Investida de Martelo",
+        "tipo": "corpo a corpo",
+        "ataque": "+5",
+        "alcance": "3m",
+        "dano": "8 (1d10+3) contundente",
+        "extra": "Acertou? Alvo faz CON DC 12 ou ganha ferimento: 1d6 Position por turno, +1d6 por novo acerto. Estancar: ação + SAB (Medicina) DC 12, ou cura mágica."
+      }
+    ],
+    "narrativa": "Empunhando uma maça gigantesca, o estômago segmentado ondulando e ressoando com animação grotesca, tais demônios são frequentemente colocados como guardiões, impedindo entrada ou saída de algum local sagrado. A criatura ganha seu nome da posição infame como carcereiro do Undead Asylum em Lordran."
+  },
+
+  "hollow_soldier": {
+    "nome": "Hollow Soldier",
+    "tipo": "Morto-vivo Médio",
+    "position_max": 22,
+    "ac": 15,
+    "velocidade_m": 6,
+    "iniciativa_dc": 12,
+    "visao_no_escuro_m": 9,
+    "atributos": { "str": 1, "dex": 1, "con": 3, "int": -2, "wis": -1, "cha": -3 },
+    "saves": { "wis": 0, "con": 5 },
+    "imunidades_dano": ["veneno"],
+    "imunidades_condicao": ["envenenado"],
+    "almas": 50,
+    "tracos": [
+      { "nome": "Keeps Crawling On", "efeito": "Ao zerar Position, faz CON save (DC = 5 + dano + 5 × usos anteriores). Sucesso: fica com 1 Position em vez de morrer. Crítico ou dano radiante ignora a habilidade." },
+      { "nome": "Fraqueza a Backstab", "efeito": "Ataque de quem ele não vê ou por quem é surpreendido = crítico automático." }
+    ],
+    "armas_disponiveis": [
+      { "nome": "Espada Enferrujada", "tipo": "corpo a corpo", "ataque": "+3", "alcance": "1,5m", "dano": "5 (1d8+1) contundente" },
+      { "nome": "Alabarda", "tipo": "corpo a corpo", "ataque": "+3", "alcance": "3m", "dano": "6 (1d10+1) cortante" },
+      { "nome": "Besta Leve", "tipo": "distância", "ataque": "+4", "alcance": "24/96m", "dano": "4 (1d8) perfurante" }
+    ],
+    "narrativa": "Hollows são encontrados em toda parte, em toda cidade. Nem todos são perigosos. Muitos apenas observam os vivos passarem; olhos brilhantes com conhecimento que perderam a capacidade de divulgar."
+  }
+}
