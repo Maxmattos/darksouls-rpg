@@ -31,6 +31,8 @@ export function defaultState() {
         almas_bancadas: 0,
         mortes: 0,
         marca_de_sangue_ativa: false,
+        imagem_url: '',
+        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
         status: 'vivo'
       },
       {
@@ -51,6 +53,8 @@ export function defaultState() {
         almas_bancadas: 0,
         mortes: 0,
         marca_de_sangue_ativa: false,
+        imagem_url: '',
+        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
         status: 'vivo'
       },
       {
@@ -71,6 +75,8 @@ export function defaultState() {
         almas_bancadas: 0,
         mortes: 0,
         marca_de_sangue_ativa: false,
+        imagem_url: '',
+        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
         status: 'vivo'
       },
       {
@@ -91,15 +97,12 @@ export function defaultState() {
         almas_bancadas: 0,
         mortes: 0,
         marca_de_sangue_ativa: false,
+        imagem_url: '',
+        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
         status: 'vivo'
       }
     ],
-    inimigos: [
-      { id: 'hs_1', bestiario_ref: 'hollow_soldier', nome_exibicao: 'Hollow Soldier — Espada',   arma_equipada: 'Espada Enferrujada', position_atual: 22, position_max: 22, fase_atual: null, nota: '' },
-      { id: 'hs_2', bestiario_ref: 'hollow_soldier', nome_exibicao: 'Hollow Soldier — Alabarda', arma_equipada: 'Alabarda',           position_atual: 22, position_max: 22, fase_atual: null, nota: '' },
-      { id: 'hs_3', bestiario_ref: 'hollow_soldier', nome_exibicao: 'Hollow Soldier — Besta',    arma_equipada: 'Besta Leve',          position_atual: 22, position_max: 22, fase_atual: null, nota: '' },
-      { id: 'asd_1', bestiario_ref: 'asylum_demon_tutorial', nome_exibicao: 'Asylum Demon', arma_equipada: null, position_atual: 60, position_max: 60, fase_atual: 1, nota: '' }
-    ],
+    inimigos: [],
     combate: {
       ativo: false,
       pool_inicial_combate: {}

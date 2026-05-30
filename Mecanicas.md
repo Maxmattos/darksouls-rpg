@@ -77,7 +77,7 @@ Após o combate, Position reverte à Base Position ou ao valor atual, o que for 
 
 ### Bloodied (Ensanguentado)
 
-Estado disparado quando `position_atual ≤ 50% do pool inicial de combate`. RAW: só ativo em combate (livro EN p.124).
+Estado disparado quando `position_atual ≤ (base_position + pool_inicial_combate) × 0.5`. O "starting Position pool" do livro (EN p.124) inclui a base **mais** o pool temporário rolado no início do combate — não só o pool temporário. RAW: só ativo em combate.
 
 Cada origem tem um conjunto fixo de benefícios em Bloodied (EN p.28-29):
 

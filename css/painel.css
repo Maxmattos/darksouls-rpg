@@ -19,7 +19,6 @@
   --vermelho-morto:   #5a0000;
   --borda:            #2a2a2a;
   --borda-hover:      #444444;
-  --cinza-morto:      #555555;
   --verde-ok:         #3a7a3a;
   --font-serif:       Georgia, 'Times New Roman', serif;
   --font-sans:        system-ui, -apple-system, sans-serif;
@@ -37,15 +36,12 @@ html, body {
   min-height: 100vh;
 }
 
-/* ---- Views ---- */
-
 .view { min-height: 100vh; }
 
 /* ========================================================
-   VISTA MESTRE
+   VISTA MESTRE — chrome
    ======================================================== */
 
-/* Top bar */
 .top-bar {
   display: flex;
   align-items: center;
@@ -64,12 +60,8 @@ html, body {
   font-size: 13px;
 }
 
-.top-actions {
-  display: flex;
-  gap: 8px;
-}
+.top-actions { display: flex; gap: 8px; }
 
-/* Main layout */
 main {
   padding: 12px 16px;
   display: flex;
@@ -94,16 +86,21 @@ h2 {
   justify-content: space-between;
 }
 
-/* Cards grid */
-.cards-grid {
+#inimigos-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-@media (max-width: 1100px) {
-  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1280px) {
+  #inimigos-list { grid-template-columns: 1fr; }
 }
+
+/* Grids de cards */
+.cards-grid { display: grid; gap: 10px; }
+
+#pcs-grid          { grid-template-columns: repeat(4, 1fr); }
+#players-pcs-grid  { grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
 /* ---- Botões genéricos ---- */
 
@@ -129,10 +126,7 @@ button:hover:not(:disabled), .btn:hover {
   background: #252525;
 }
 
-button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 button.btn-danger { color: var(--brasa); border-color: var(--brasa); }
 button.btn-danger:hover:not(:disabled) { background: rgba(201,79,30,0.12); }
@@ -140,7 +134,6 @@ button.btn-danger:hover:not(:disabled) { background: rgba(201,79,30,0.12); }
 button.btn-primary { color: var(--dourado); border-color: var(--dourado); }
 button.btn-primary:hover:not(:disabled) { background: var(--dourado-bg); }
 
-/* Input disfarçado de botão */
 .btn input[type="file"] {
   position: absolute;
   opacity: 0;
@@ -172,91 +165,8 @@ input[type="number"]:focus, input[type="text"]:focus, textarea:focus {
 
 textarea { resize: vertical; min-height: 48px; }
 
-/* ---- Card de PC (vista mestre) ---- */
+/* ---- Compact stat rows (vista mestre) ---- */
 
-.card-pc {
-  background: var(--bg-card);
-  border: 1px solid var(--borda);
-  border-radius: var(--radius);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-shadow: var(--shadow);
-  position: relative;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.card-pc.bloodied {
-  background: var(--brasa-bg);
-  border-color: var(--brasa);
-}
-
-.card-pc.morto {
-  filter: grayscale(1);
-  border-color: var(--vermelho-sangue);
-}
-.card-pc.morto .you-died-overlay { filter: none; }
-.card-pc.morto .you-died-text { filter: none; }
-
-.card-pc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.card-pc-nome {
-  font-family: var(--font-serif);
-  font-size: 15px;
-  color: var(--dourado);
-  font-weight: bold;
-}
-
-.card-pc-classe {
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-/* Badges */
-.badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 3px;
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badge-bloodied { background: var(--brasa); color: #fff; }
-.badge-morte { background: var(--vermelho-sangue); color: #fff; }
-.badge-marca { background: #4a2a00; color: var(--dourado); border: 1px solid var(--dourado); }
-.badge-permadeath { background: #3a0000; color: #ff6666; border: 1px solid #ff6666; }
-
-/* Atributos */
-.atributos-row {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.attr-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #1a1a1a;
-  border: 1px solid var(--borda);
-  border-radius: 3px;
-  padding: 2px 5px;
-  min-width: 36px;
-}
-
-.attr-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; }
-.attr-val { font-size: 12px; font-weight: bold; }
-.attr-val.bloodied-changed { color: var(--dourado); }
-
-/* Position + Estus + Almas */
 .stat-row {
   display: flex;
   align-items: center;
@@ -275,32 +185,42 @@ textarea { resize: vertical; min-height: 48px; }
   font-weight: bold;
 }
 
-.position-temp {
-  font-size: 11px;
-  color: var(--brasa);
+.position-temp { font-size: 11px; color: var(--brasa); }
+
+.mortes-row { display: flex; align-items: center; gap: 6px; }
+
+/* ========================================================
+   CARD DE PC — base comum a ambas as vistas
+   ======================================================== */
+
+.card-pc, .card-pc-player {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  width: 100%;
 }
 
-/* Contador de mortes */
-.mortes-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* Tamanho mínimo só na vista jogadores */
+.card-pc-player { min-width: 600px; max-width: 900px; }
+
+.card-pc.bloodied, .card-pc-player.bloodied {
+  border: 2px solid var(--brasa);
+  box-shadow: 0 0 16px rgba(201, 79, 30, 0.2);
 }
 
-.mortes-pips {
-  display: flex;
-  gap: 4px;
+.card-pc.morto, .card-pc-player.morto {
+  border-color: var(--vermelho-sangue);
 }
 
-.pip {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 1px solid var(--text-dim);
-  background: transparent;
+/* Grayscale no conteúdo quando morto */
+.card-pc.morto .card-pc-content,
+.card-pc-player.morto .card-pc-inner {
+  filter: grayscale(1);
 }
-
-.pip.ativo { background: var(--vermelho-sangue); border-color: var(--vermelho-sangue); }
 
 /* YOU DIED overlay */
 .you-died-overlay {
@@ -310,39 +230,384 @@ textarea { resize: vertical; min-height: 48px; }
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .you-died-text {
   font-family: var(--font-serif);
-  font-size: 28px;
+  font-size: clamp(28px, 3vw, 48px);
   font-weight: bold;
   color: var(--vermelho-sangue);
-  text-shadow: 0 0 12px rgba(139,0,0,0.8);
-  letter-spacing: 0.1em;
-  opacity: 0.9;
+  text-shadow: 0 0 16px rgba(139,0,0,0.9);
+  letter-spacing: 0.12em;
+  opacity: 0.95;
 }
 
-/* Ações do card PC */
-.card-pc-actions {
+/* ---- Layout horizontal — vista jogadores ---- */
+
+.card-pc-inner {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Coluna esquerda: portrait + slots */
+.pc-card-left {
+  width: 35%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pc-portrait {
+  width: 100%;
+  aspect-ratio: 2/3;
+  border: 1px solid rgba(201, 168, 76, 0.5);
+  border-radius: var(--radius);
+  background: var(--bg-card-alt);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pc-portrait-placeholder {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Coluna direita */
+.pc-card-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Slots de equipamento ---- */
+
+.pc-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.pc-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.pc-slot {
+  aspect-ratio: 1;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  background: var(--bg-card-alt);
+  border-radius: 3px;
+  width: 100%;
+}
+
+.pc-slot-label {
+  font-size: 8px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Tipografia e separadores ---- */
+
+.pc-nome {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.2vw, 38px);
+  color: var(--dourado);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  margin: 0 0 2px;
+}
+
+.pc-subtitulo {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0 0 4px;
+}
+
+.pc-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  margin-top: 4px;
+}
+
+.pc-separator {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 8px;
+  color: var(--dourado);
+}
+
+.pc-separator::before,
+.pc-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(201, 168, 76, 0.2);
+  margin: 0 6px;
+}
+
+/* ---- Vital stats (vista jogadores) ---- */
+
+.pc-vital-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.pc-vital-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pc-vital-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.pc-vital-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pc-vital-val {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1;
+  color: var(--text);
+}
+
+.pc-vital-dim {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2vw, 30px);
+  line-height: 1;
+  color: var(--text-dim);
+}
+
+.pc-vital-sep {
+  font-size: clamp(16px, 1.6vw, 22px);
+  color: var(--text-dim);
+}
+
+.pc-vital-temp { font-size: 13px; color: var(--brasa); }
+
+/* Atributos — 6 colunas com divisores */
+.pc-attrs-6col {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.pc-attr-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 2px;
+  border-right: 1px solid rgba(201, 168, 76, 0.12);
+}
+
+.pc-attr-col:last-child { border-right: none; }
+
+.pc-attr-val {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  line-height: 1.2;
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.pc-attr-val.bloodied-changed { color: var(--dourado); }
+
+/* AC + Mortes */
+.pc-ac-deaths {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: end;
+}
+
+.pc-ac-val {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 2.5vw, 32px);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+/* Mortes pips */
+.mortes-pips { display: flex; gap: 5px; align-items: center; }
+
+.pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--text-dim);
+  background: transparent;
+}
+
+.pip.ativo { background: var(--vermelho-sangue); border-color: var(--vermelho-sangue); }
+
+/* Almas */
+.pc-almas {
+  font-size: 13px;
+  color: var(--text-dim);
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.icon-coletadas { color: var(--brasa); }
+.icon-bancadas  { color: var(--dourado); }
+
+/* Input inline de almas (vista mestre) */
+.pc-almas-input {
+  width: 52px;
+  font-size: 13px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(201, 168, 76, 0.3);
+  color: var(--text);
+  text-align: center;
+  padding: 0 2px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.pc-almas-input::-webkit-outer-spin-button,
+.pc-almas-input::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; }
+.pc-almas-input:focus { outline: none; border-bottom-color: var(--dourado); }
+
+/* Ações do card */
+.card-pc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
   position: relative;
   z-index: 2;
 }
 
-.card-pc-actions button { font-size: 11px; padding: 3px 8px; }
+.card-pc-actions button { font-size: 11px; padding: 4px 10px; }
 
-/* Efeitos Bloodied textuais */
-.bloodied-efeitos {
+/* Efeitos */
+.pc-effects { margin-top: 4px; }
+
+.pc-effects-subtitle {
   font-size: 11px;
-  color: var(--text-dim);
-  padding-left: 8px;
-  border-left: 2px solid var(--brasa);
+  text-transform: uppercase;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
 }
 
-.bloodied-efeitos li { margin: 2px 0; }
+.pc-effects-equip .pc-effects-subtitle { color: var(--dourado); }
+
+.pc-effects-none { color: var(--text-dim); font-size: 13px; }
+
+.pc-effects-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.pc-effects-equip .pc-effects-list li::before {
+  content: '◆ ';
+  color: var(--dourado);
+  font-size: 8px;
+}
+
+.pc-effects-bloodied {
+  background: rgba(201, 79, 30, 0.15);
+  border-left: 2px solid var(--brasa);
+  padding: 8px 10px;
+  border-radius: 0 3px 3px 0;
+  margin-top: 8px;
+}
+
+.pc-effects-bloodied .pc-effects-subtitle { color: var(--brasa); }
+
+.pc-effects-bloodied .pc-effects-list li::before {
+  content: '◆ ';
+  color: var(--brasa);
+  font-size: 8px;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-bloodied { background: var(--brasa); color: #fff; }
+.badge-morte { background: var(--vermelho-sangue); color: #fff; }
+.badge-marca { background: #4a2a00; color: var(--dourado); border: 1px solid var(--dourado); }
+.badge-permadeath { background: #3a0000; color: #ff6666; border: 1px solid #ff6666; }
+
+.attr-arrow { color: var(--text-dim); margin: 0 2px; font-size: 0.85em; }
+.attr-new-val { color: var(--dourado); }
+
+/* ========================================================
+   VISTA MESTRE — overrides compactos
+   ======================================================== */
+
+#view-master .card-pc {
+  padding: 10px;
+  min-width: 0;
+}
+
+#view-master .pc-nome { font-size: 15px; letter-spacing: 0.03em; }
+#view-master .pc-subtitulo { font-size: 11px; margin-bottom: 2px; }
+#view-master .pc-separator { margin: 5px 0; }
+#view-master .pc-vital-label { font-size: 9px; }
+#view-master .pc-attr-col { padding: 2px 1px; }
+#view-master .pc-attr-val { font-size: 14px; }
+
+#view-master .pc-slots {
+  grid-template-columns: repeat(5, 36px);
+  gap: 4px;
+}
+
+#view-master .pc-slot-label { font-size: 7px; }
+#view-master .pc-effects-subtitle { font-size: 10px; }
+#view-master .pc-effects-none { font-size: 11px; }
+#view-master .pc-effects-list { font-size: 11px; }
 
 /* ---- Card de Inimigo (vista mestre) ---- */
 
@@ -473,13 +738,9 @@ textarea { resize: vertical; min-height: 48px; }
   position: relative;
 }
 
-.narrativa-box button {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-}
+.narrativa-box button { position: absolute; top: 12px; right: 12px; }
 
-/* ---- Combate bar (footer) ---- */
+/* ---- Combate bar ---- */
 
 .combat-bar {
   position: sticky;
@@ -495,6 +756,15 @@ textarea { resize: vertical; min-height: 48px; }
 
 .combat-status { font-family: var(--font-serif); color: var(--dourado); font-size: 13px; }
 .combat-actions { display: flex; gap: 8px; }
+
+.arma-select {
+  background: #1a1a1a;
+  color: var(--text);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 3px 6px;
+  font-size: 12px;
+}
 
 /* ========================================================
    VISTA JOGADORES
@@ -521,140 +791,20 @@ textarea { resize: vertical; min-height: 48px; }
   text-transform: uppercase;
 }
 
+.players-session-subtitulo {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+}
+
 #players-pcs-grid {
-  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 18px;
   flex: 1;
-}
-
-/* Card PC — vista jogadores: tamanho grande legível a 2-3m */
-
-.card-pc-player {
-  background: var(--bg-card);
-  border: 1px solid var(--borda);
-  border-radius: var(--radius);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: var(--shadow);
-  position: relative;
-}
-
-.card-pc-player.bloodied {
-  background: var(--brasa-bg);
-  border-color: var(--brasa);
-}
-
-.card-pc-player.morto {
-  filter: grayscale(1);
-  border-color: var(--vermelho-sangue);
-}
-.card-pc-player.morto .you-died-text-player { filter: none; }
-
-.player-nome {
-  font-family: var(--font-serif);
-  font-size: clamp(20px, 2.2vw, 32px);
-  color: var(--dourado);
-  font-weight: bold;
-}
-
-.player-classe {
-  font-size: clamp(12px, 1.2vw, 18px);
-  color: var(--text-dim);
-}
-
-.player-stat-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.player-stat-label {
-  font-size: clamp(11px, 1vw, 16px);
-  color: var(--text-dim);
-  min-width: 90px;
-}
-
-.player-stat-val {
-  font-size: clamp(24px, 2.5vw, 40px);
-  font-weight: bold;
-  line-height: 1;
-}
-
-.player-stat-sep {
-  font-size: clamp(14px, 1.5vw, 22px);
-  color: var(--text-dim);
-}
-
-.player-badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.player-badges .badge {
-  font-size: clamp(12px, 1.1vw, 18px);
-  padding: 4px 12px;
-}
-
-.player-atributos {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.player-attr-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #1a1a1a;
-  border: 1px solid var(--borda);
-  border-radius: 3px;
-  padding: 4px 8px;
-  min-width: 44px;
-}
-
-.player-attr-label { font-size: clamp(9px, 0.8vw, 13px); color: var(--text-dim); text-transform: uppercase; }
-.player-attr-val { font-size: clamp(16px, 1.6vw, 26px); font-weight: bold; }
-.player-attr-val.bloodied-changed { color: var(--dourado); }
-
-.player-bloodied-efeitos {
-  font-size: clamp(12px, 1.1vw, 17px);
-  color: var(--text-dim);
-  padding-left: 10px;
-  border-left: 3px solid var(--brasa);
-}
-
-.player-bloodied-efeitos li { margin: 3px 0; }
-
-.player-mortes-pips {
-  display: flex;
-  gap: 6px;
-}
-
-.player-pip {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--text-dim);
-  background: transparent;
-}
-
-.player-pip.ativo { background: var(--vermelho-sangue); border-color: var(--vermelho-sangue); }
-
-.you-died-text-player {
-  font-family: var(--font-serif);
-  font-size: clamp(32px, 4vw, 60px);
-  font-weight: bold;
-  color: var(--vermelho-sangue);
-  text-shadow: 0 0 20px rgba(139,0,0,0.9);
-  letter-spacing: 0.12em;
-  text-align: center;
-}
-
-.player-position-temp {
-  font-size: clamp(13px, 1.2vw, 19px);
-  color: var(--brasa);
+  align-content: start;
 }
 
 /* Sync alert */
@@ -669,6 +819,28 @@ textarea { resize: vertical; min-height: 48px; }
   padding: 8px 20px;
   border-radius: var(--radius);
   font-size: 13px;
+}
+
+/* ---- Vista jogadores — tamanhos reduzidos ~20-25% ---- */
+
+#view-players .card-pc-player { padding: 18px; }
+#view-players .pc-card-left   { width: 28%; }
+
+/* Portrait com proporção 2:3 mantida, altura ~80% da original */
+#view-players .pc-portrait { width: auto; height: 240px; }
+
+#view-players .pc-slots { gap: 6px; }
+
+#view-players .pc-nome      { font-size: 32px; }
+#view-players .pc-vital-val { font-size: 40px; }
+#view-players .pc-vital-dim { font-size: 26px; }
+#view-players .pc-attr-val  { font-size: 18px; }
+#view-players .pc-ac-val    { font-size: 26px; }
+
+#view-players .pip {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
 }
 
 /* ========================================================
@@ -686,14 +858,9 @@ dialog {
   box-shadow: 0 8px 32px rgba(0,0,0,0.8);
 }
 
-dialog::backdrop {
-  background: rgba(0,0,0,0.75);
-}
+dialog::backdrop { background: rgba(0,0,0,0.75); }
 
-dialog h2 {
-  margin: 0 0 12px;
-  font-size: 16px;
-}
+dialog h2 { margin: 0 0 12px; font-size: 16px; }
 
 dialog p { margin: 0 0 12px; font-size: 13px; color: var(--text-dim); }
 
@@ -734,22 +901,11 @@ dialog p { margin: 0 0 12px; font-size: 13px; color: var(--text-dim); }
 .bestario-item-nome { font-family: var(--font-serif); color: var(--dourado); }
 .bestario-item-tipo { font-size: 11px; color: var(--text-dim); }
 
-/* Arma seletor */
-.arma-select {
-  background: #1a1a1a;
-  color: var(--text);
-  border: 1px solid var(--borda);
-  border-radius: var(--radius);
-  padding: 3px 6px;
-  font-size: 12px;
-}
-
-/* Transição atributo bloodied: "15 → 17" */
-.attr-arrow { color: var(--text-dim); margin: 0 2px; font-size: 0.85em; }
-.attr-new-val { color: var(--dourado); }
-
 /* 4K scaling */
 @media (min-width: 2560px) {
   html { font-size: 18px; }
-  .player-stat-val { font-size: clamp(36px, 2.2vw, 56px); }
+  #players-pcs-grid {
+    grid-template-columns: repeat(2, minmax(600px, 900px));
+    justify-content: center;
+  }
 }

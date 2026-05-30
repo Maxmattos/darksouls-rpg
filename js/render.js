@@ -2,6 +2,14 @@ import { isBloodied, bloodiedEfeitos } from './logica.js';
 
 const ATTR_LABELS = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
+const SLOTS = [
+  { key: 'sword',  label: 'SWORD'  },
+  { key: 'shield', label: 'SHIELD' },
+  { key: 'armor',  label: 'ARMOR'  },
+  { key: 'ring1',  label: 'RING 1' },
+  { key: 'ring2',  label: 'RING 2' },
+];
+
 /* ---- Utilitários de DOM ---- */
 
 function setHTML(id, html) {
@@ -19,31 +27,39 @@ function setVal(id, val) {
   if (el) el.value = val;
 }
 
-/* Atualiza um campo sem destruir foco */
 function patchField(el, html) {
   if (el && el.innerHTML !== html) el.innerHTML = html;
 }
 
-/* ---- Render de atributos com Bloodied diff ---- */
+/* ---- Helpers de card PC ---- */
 
-function renderAttrRow(atributos, atributosDelta, cssPrefix) {
+function renderPcAttrCols(atributos, atributosDelta) {
   return Object.entries(ATTR_LABELS).map(([key, label]) => {
     const base = atributos[key] ?? 0;
     const delta = atributosDelta[key] ?? 0;
-    let valHtml;
-    if (delta !== 0) {
-      valHtml = `<span>${base}</span><span class="attr-arrow">→</span><span class="attr-new-val">${base + delta}</span>`;
-    } else {
-      valHtml = `<span>${base}</span>`;
-    }
-    return `<div class="${cssPrefix}-item">
-      <span class="${cssPrefix}-label">${label}</span>
-      <span class="${cssPrefix}-val${delta !== 0 ? ' bloodied-changed' : ''}">${valHtml}</span>
+    const valHtml = delta !== 0
+      ? `${base}<span class="attr-arrow">→</span><span class="attr-new-val">${base + delta}</span>`
+      : `${base}`;
+    return `<div class="pc-attr-col">
+      <span class="pc-vital-label">${label}</span>
+      <span class="pc-attr-val${delta !== 0 ? ' bloodied-changed' : ''}">${valHtml}</span>
     </div>`;
   }).join('');
 }
 
-/* ---- Pips de morte ---- */
+function renderSlotsHtml() {
+  return SLOTS.map(s => `
+    <div class="pc-slot-wrap">
+      <div class="pc-slot"></div>
+      <span class="pc-slot-label">${s.label}</span>
+    </div>`).join('');
+}
+
+function renderPortraitHtml(pc) {
+  return pc.imagem_url
+    ? `<img src="${pc.imagem_url}" alt="${pc.nome}">`
+    : `<span class="pc-portrait-placeholder">Imagem</span>`;
+}
 
 function renderPips(mortes, cls) {
   return [0, 1, 2].map(i => `<span class="${cls}${i < mortes ? ' ativo' : ''}"></span>`).join('');
@@ -54,16 +70,12 @@ function renderPips(mortes, cls) {
    ======================================================== */
 
 export function renderMaster(state, bestiario, origens) {
-  setText('session-nome', state.sessao.nome);
   setText('session-data', state.sessao.data);
 
   const grid = document.getElementById('pcs-grid');
   if (grid) {
-    // Render diff: reutiliza cards existentes por id
-    const existingIds = new Set([...grid.children].map(c => c.dataset.pcId));
     const newIds = new Set(state.pcs.map(p => p.id));
 
-    // Remove removidos (raro mas possível em imports)
     for (const child of [...grid.children]) {
       if (!newIds.has(child.dataset.pcId)) child.remove();
     }
@@ -79,7 +91,6 @@ export function renderMaster(state, bestiario, origens) {
       renderPcCardMaster(card, pc, state, origens);
     }
 
-    // Ordenar filhos conforme state.pcs
     state.pcs.forEach((pc, i) => {
       const card = grid.querySelector(`[data-pc-id="${pc.id}"]`);
       if (card && grid.children[i] !== card) grid.appendChild(card);
@@ -100,41 +111,38 @@ function renderPcCardMaster(card, pc, state, origens) {
   const acEfetiva = (pc.ac_base ?? 10) + efeitos.acDelta;
   const poolTemp = state.combate.pool_inicial_combate[pc.id] ?? null;
 
-  const attrHtml = renderAttrRow(pc.atributos, efeitos.atributosDelta, 'attr');
+  const positionTempHtml = (state.combate.ativo && poolTemp != null && poolTemp > 0)
+    ? `<span class="position-temp">(+${poolTemp} temp)</span>`
+    : '';
+
+  const acDisplay = efeitos.acDelta !== 0
+    ? `${pc.ac_base ?? 10}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
+    : `${acEfetiva}`;
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
     pc.marca_de_sangue_ativa ? `<span class="badge badge-marca">Marca de Sangue</span>` : '',
     pc.mortes >= 3 ? `<span class="badge badge-permadeath">Permadeath iminente</span>` : ''
-  ].join('');
+  ].filter(Boolean).join('');
 
-  const positionTempHtml = (state.combate.ativo && poolTemp != null)
-    ? `<span class="position-temp">(+${poolTemp} temp)</span>`
-    : '';
-
-  const bloodiedEfeitosHtml = (blooded && efeitos.textos.length > 0)
-    ? `<ul class="bloodied-efeitos">${efeitos.textos.map(t => `<li>${t}</li>`).join('')}</ul>`
-    : '';
-
-  const acDisplay = efeitos.acDelta !== 0
-    ? `${pc.ac_base} <span class="attr-arrow">→</span> <span class="attr-new-val">${acEfetiva}</span>`
-    : `${acEfetiva}`;
-
-  const acHtml = `<span class="stat-label">AC</span><span class="stat-value-display">${acDisplay}</span>`;
-
-  const btnMarcarMorte = pc.mortes >= 3 || morto
+  const btnEstus = `<button data-action="drink-estus" data-pc="${pc.id}"${pc.estus_atual <= 0 ? ' disabled' : ''}>Beber Estus</button>`;
+  const btnMarcarMorte = (pc.mortes >= 3 || morto)
     ? `<button class="btn-danger" data-action="mark-death" data-pc="${pc.id}" disabled>Marcar morte</button>`
     : `<button class="btn-danger" data-action="mark-death" data-pc="${pc.id}">Marcar morte</button>`;
-
   const btnRecuperar = pc.marca_de_sangue_ativa
     ? `<button data-action="recover-mark" data-pc="${pc.id}">Recuperar marca</button>`
     : `<button data-action="recover-mark" data-pc="${pc.id}" disabled>Recuperar marca</button>`;
-
   const btnRetornar = morto
     ? `<button class="btn-primary" data-action="return-combat" data-pc="${pc.id}">Retornar ao combate</button>`
     : '';
 
-  const btnEstus = `<button data-action="drink-estus" data-pc="${pc.id}"${pc.estus_atual <= 0 ? ' disabled' : ''}>Beber Estus</button>`;
+  // TODO: equipment effects — implementar quando lógica de equipamento estiver pronta
+  const bloodiedEfeitosHtml = (blooded && efeitos.textos.length > 0)
+    ? `<div class="pc-effects-bloodied">
+        <div class="pc-effects-subtitle">Bloodied Effects</div>
+        <ul class="pc-effects-list">${efeitos.textos.map(t => `<li>${t}</li>`).join('')}</ul>
+      </div>`
+    : '';
 
   const youDiedHtml = morto
     ? `<div class="you-died-overlay"><span class="you-died-text">YOU DIED</span></div>`
@@ -142,50 +150,59 @@ function renderPcCardMaster(card, pc, state, origens) {
 
   card.innerHTML = `
     ${youDiedHtml}
-    <div class="card-pc-header">
-      <div>
-        <div class="card-pc-nome">${pc.nome}</div>
-        <div class="card-pc-classe">${pc.classe} · ${pc.origem}</div>
+    <div class="card-pc-content">
+      <div class="pc-nome">${pc.nome}</div>
+      <div class="pc-subtitulo">${pc.classe} · ${pc.origem}</div>
+      ${badgesHtml ? `<div class="pc-badges">${badgesHtml}</div>` : ''}
+      <div class="pc-separator">◆</div>
+      <div class="pc-attrs-6col">${renderPcAttrCols(pc.atributos, efeitos.atributosDelta)}</div>
+      <div class="pc-separator">◆</div>
+      <div class="stat-row">
+        <span class="stat-label">AC</span>
+        <span class="stat-value-display">${acDisplay}</span>
       </div>
-      <div>${badgesHtml}</div>
-    </div>
-    <div class="atributos-row">${attrHtml}</div>
-    <div class="stat-row">${acHtml}</div>
-    <div class="stat-row">
-      <span class="stat-label">Position</span>
-      <input type="number" class="field-position" data-pc="${pc.id}" data-field="position_atual" value="${pc.position_atual}" min="0" style="width:60px">
-      <span class="stat-value-display"> / ${pc.base_position}</span>
-      ${positionTempHtml}
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Base Position</span>
-      <input type="number" data-pc="${pc.id}" data-field="base_position" value="${pc.base_position}" min="1" style="width:60px">
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Estus</span>
-      <input type="number" data-pc="${pc.id}" data-field="estus_atual" value="${pc.estus_atual}" min="0" style="width:48px">
-      <span>/</span>
-      <input type="number" data-pc="${pc.id}" data-field="estus_max" value="${pc.estus_max}" min="0" style="width:48px">
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Almas coletadas</span>
-      <input type="number" data-pc="${pc.id}" data-field="almas_coletadas" value="${pc.almas_coletadas}" min="0" style="width:80px">
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Almas bancadas</span>
-      <input type="number" data-pc="${pc.id}" data-field="almas_bancadas" value="${pc.almas_bancadas}" min="0" style="width:80px">
-    </div>
-    <div class="mortes-row">
-      <span class="stat-label">Mortes</span>
-      <div class="mortes-pips">${renderPips(pc.mortes, 'pip')}</div>
-      <span style="font-size:11px;color:var(--text-dim)">${pc.mortes}/3</span>
-    </div>
-    ${bloodiedEfeitosHtml}
-    <div class="card-pc-actions">
-      ${btnEstus}
-      ${btnMarcarMorte}
-      ${btnRecuperar}
-      ${btnRetornar}
+      <div class="stat-row">
+        <span class="stat-label">Position</span>
+        <input type="number" data-pc="${pc.id}" data-field="position_atual" value="${pc.position_atual}" min="0" style="width:56px">
+        <span>/</span>
+        <input type="number" data-pc="${pc.id}" data-field="base_position" value="${pc.base_position}" min="1" style="width:56px">
+        ${positionTempHtml}
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Estus</span>
+        <input type="number" data-pc="${pc.id}" data-field="estus_atual" value="${pc.estus_atual}" min="0" style="width:48px">
+        <span>/</span>
+        <input type="number" data-pc="${pc.id}" data-field="estus_max" value="${pc.estus_max}" min="0" style="width:48px">
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Almas coletadas</span>
+        <input type="number" data-pc="${pc.id}" data-field="almas_coletadas" value="${pc.almas_coletadas}" min="0" style="width:72px">
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Almas bancadas</span>
+        <input type="number" data-pc="${pc.id}" data-field="almas_bancadas" value="${pc.almas_bancadas}" min="0" style="width:72px">
+      </div>
+      <div class="mortes-row">
+        <span class="stat-label">Mortes</span>
+        <div class="mortes-pips">${renderPips(pc.mortes, 'pip')}</div>
+        <span style="font-size:11px;color:var(--text-dim)">${pc.mortes}/3</span>
+      </div>
+      <div class="card-pc-actions">
+        ${btnEstus}
+        ${btnMarcarMorte}
+        ${btnRecuperar}
+        ${btnRetornar}
+      </div>
+      <div class="pc-separator">◆</div>
+      <div class="pc-slots">${renderSlotsHtml()}</div>
+      <div class="pc-effects">
+        <div class="pc-effects-equip">
+          <div class="pc-separator">◆</div>
+          <div class="pc-effects-subtitle">Equipment Effects</div>
+          <span class="pc-effects-none">—</span>
+        </div>
+        ${bloodiedEfeitosHtml}
+      </div>
     </div>
   `;
 }
@@ -196,7 +213,6 @@ function renderInimigos(state, bestiario) {
   const container = document.getElementById('inimigos-list');
   if (!container) return;
 
-  const existingIds = new Set([...container.children].map(c => c.dataset.inimigoId));
   const newIds = new Set(state.inimigos.map(e => e.id));
 
   for (const child of [...container.children]) {
@@ -233,7 +249,6 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       <button data-action="advance-fase" data-inimigo="${inimigo.id}" title="Avançar fase">▶</button>
     </div>` : '';
 
-  const collapseKey = `inimigo-collapse-${inimigo.id}`;
   const isCollapsed = card._collapsed === true && !expanded;
 
   const statsHtml = base ? `
@@ -254,12 +269,11 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       ${base.tracos.map(t => `<div class="acao-item"><span class="acao-nome">${t.nome}</span> — ${t.efeito}</div>`).join('')}
     </div>` : '';
 
-  // Arma equipada: aparece independente de `acoes` existirem
   const armaEqAtual = base?.armas_disponiveis?.find(w => w.nome === inimigo.arma_equipada);
   const armaHtml = base?.armas_disponiveis?.length ? `
     <div>
       <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">ARMA EQUIPADA</div>
-      <div class="stat-row">
+      <div style="display:flex;align-items:center;gap:6px">
         <select class="arma-select" data-action="set-arma" data-inimigo="${inimigo.id}">
           ${base.armas_disponiveis.map(a =>
             `<option value="${a.nome}"${inimigo.arma_equipada === a.nome ? ' selected' : ''}>${a.nome}</option>`
@@ -304,7 +318,6 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
     : '';
 
   const removeTitle = isMorto ? 'Remover (0 Position)' : 'Remover inimigo';
-  const removeDirect = isMorto;
 
   card.innerHTML = `
     <div class="card-inimigo-header">
@@ -317,7 +330,7 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       </div>
       ${faseHtml}
       ${isBloodiedInimigo ? `<span class="badge badge-bloodied">Bloodied</span>` : ''}
-      <button class="btn-remove-inimigo" data-action="remove-inimigo" data-inimigo="${inimigo.id}" data-direct="${removeDirect}" aria-label="${removeTitle}" title="${removeTitle}">✕</button>
+      <button class="btn-remove-inimigo" data-action="remove-inimigo" data-inimigo="${inimigo.id}" data-direct="${isMorto}" aria-label="${removeTitle}" title="${removeTitle}">✕</button>
     </div>
     <div class="card-inimigo-body${isCollapsed ? ' collapsed' : ''}">
       ${statsHtml}
@@ -361,13 +374,9 @@ function renderCombatBar(state) {
    ======================================================== */
 
 export function renderPlayers(state, origens) {
-  const el = document.getElementById('players-session-nome');
-  if (el) el.textContent = state.sessao.nome;
-
   const grid = document.getElementById('players-pcs-grid');
   if (!grid) return;
 
-  const existingIds = new Set([...grid.children].map(c => c.dataset.pcId));
   const newIds = new Set(state.pcs.map(p => p.id));
 
   for (const child of [...grid.children]) {
@@ -399,8 +408,16 @@ function renderPcCardPlayers(card, pc, state, origens) {
 
   const efeitos = blooded ? bloodiedEfeitos(pc, origens) : { atributosDelta: {}, acDelta: 0, textos: [] };
   const poolTemp = state.combate.pool_inicial_combate[pc.id] ?? null;
+  const acBase = pc.ac_base ?? 10;
+  const acEfetiva = acBase + efeitos.acDelta;
 
-  const attrHtml = renderAttrRow(pc.atributos, efeitos.atributosDelta, 'player-attr');
+  const positionTempHtml = (state.combate.ativo && poolTemp != null && poolTemp > 0)
+    ? `<span class="pc-vital-temp">+${poolTemp}</span>`
+    : '';
+
+  const acDisplay = efeitos.acDelta !== 0
+    ? `${acBase}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
+    : `${acEfetiva}`;
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
@@ -408,47 +425,77 @@ function renderPcCardPlayers(card, pc, state, origens) {
     morto ? `<span class="badge badge-morte">Aguardando respawn</span>` : ''
   ].filter(Boolean).join('');
 
-  const positionTempHtml = (state.combate.ativo && poolTemp != null)
-    ? `<span class="player-position-temp">(+${poolTemp} temp)</span>`
-    : '';
+  // TODO: equipment effects — implementar quando lógica de equipamento estiver pronta
+  const equipEfeitosHtml = `<span class="pc-effects-none">—</span>`;
 
   const bloodiedEfeitosHtml = (blooded && efeitos.textos.length > 0)
-    ? `<ul class="player-bloodied-efeitos">${efeitos.textos.map(t => `<li>${t}</li>`).join('')}</ul>`
+    ? `<div class="pc-effects-bloodied">
+        <div class="pc-effects-subtitle">Bloodied Effects</div>
+        <ul class="pc-effects-list">${efeitos.textos.map(t => `<li>${t}</li>`).join('')}</ul>
+      </div>`
     : '';
 
   const youDiedHtml = morto
-    ? `<div class="you-died-text-player">YOU DIED</div>`
+    ? `<div class="you-died-overlay"><span class="you-died-text">YOU DIED</span></div>`
     : '';
 
   card.innerHTML = `
     ${youDiedHtml}
-    <div class="player-nome">${pc.nome}</div>
-    <div class="player-classe">${pc.classe} · ${pc.origem}</div>
-    <div class="player-badges">${badgesHtml}</div>
-    <div class="player-stat-row">
-      <span class="player-stat-label">Position</span>
-      <span class="player-stat-val">${pc.position_atual}</span>
-      <span class="player-stat-sep"> / ${pc.base_position}</span>
-      ${positionTempHtml}
+    <div class="card-pc-inner">
+      <div class="pc-card-left">
+        <div class="pc-portrait">${renderPortraitHtml(pc)}</div>
+        <div class="pc-slots">${renderSlotsHtml()}</div>
+      </div>
+      <div class="pc-card-right">
+        <div class="pc-nome">${pc.nome}</div>
+        <div class="pc-subtitulo">${pc.classe} · ${pc.origem}</div>
+        ${badgesHtml ? `<div class="pc-badges">${badgesHtml}</div>` : ''}
+        <div class="pc-separator">◆</div>
+        <div class="pc-vital-grid">
+          <div class="pc-vital-stat">
+            <span class="pc-vital-label">Position</span>
+            <div class="pc-vital-row">
+              <span class="pc-vital-val">${pc.position_atual}</span>
+              <span class="pc-vital-sep">/</span>
+              <span class="pc-vital-dim">${pc.base_position}</span>
+              ${positionTempHtml}
+            </div>
+          </div>
+          <div class="pc-vital-stat">
+            <span class="pc-vital-label">Estus</span>
+            <div class="pc-vital-row">
+              <span class="pc-vital-val">${pc.estus_atual}</span>
+              <span class="pc-vital-sep">/</span>
+              <span class="pc-vital-dim">${pc.estus_max}</span>
+            </div>
+          </div>
+        </div>
+        <div class="pc-separator">◆</div>
+        <div class="pc-attrs-6col">${renderPcAttrCols(pc.atributos, efeitos.atributosDelta)}</div>
+        <div class="pc-separator">◆</div>
+        <div class="pc-ac-deaths">
+          <div class="pc-vital-stat">
+            <span class="pc-vital-label">AC</span>
+            <div class="pc-ac-val">${acDisplay}</div>
+          </div>
+          <div class="pc-vital-stat">
+            <span class="pc-vital-label">Mortes</span>
+            <div class="mortes-pips">${renderPips(pc.mortes, 'pip')}</div>
+          </div>
+        </div>
+        <div class="pc-almas">
+          <span><span class="icon-coletadas">🔥</span> Coletadas: ${pc.almas_coletadas}</span>
+          <span><span class="icon-bancadas">⚱️</span> Bancadas: ${pc.almas_bancadas}</span>
+        </div>
+        <div class="pc-effects">
+          <div class="pc-effects-equip">
+            <div class="pc-separator">◆</div>
+            <div class="pc-effects-subtitle">Equipment Effects</div>
+            ${equipEfeitosHtml}
+          </div>
+          ${bloodiedEfeitosHtml}
+        </div>
+      </div>
     </div>
-    <div class="player-stat-row">
-      <span class="player-stat-label">Estus</span>
-      <span class="player-stat-val">${pc.estus_atual}</span>
-      <span class="player-stat-sep"> / ${pc.estus_max}</span>
-    </div>
-    <div class="player-stat-row">
-      <span class="player-stat-label">Almas coletadas</span>
-      <span class="player-stat-val">${pc.almas_coletadas}</span>
-    </div>
-    <div class="player-stat-row">
-      <span class="player-stat-label">Almas bancadas</span>
-      <span class="player-stat-val">${pc.almas_bancadas}</span>
-    </div>
-    <div class="player-stat-row">
-      <span class="player-stat-label">Mortes</span>
-      <div class="player-mortes-pips">${renderPips(pc.mortes, 'player-pip')}</div>
-    </div>
-    <div class="player-atributos">${attrHtml}</div>
-    ${bloodiedEfeitosHtml}
   `;
 }

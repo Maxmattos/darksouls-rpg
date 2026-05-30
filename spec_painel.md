@@ -95,6 +95,14 @@ Duas camadas complementares:
       "almas_bancadas": "int",
       "mortes": "int (0–3)",
       "marca_de_sangue_ativa": "bool",
+      "imagem_url": "string (URL ou caminho relativo; vazio = placeholder)",
+      "equipamento": {
+        "sword": "string | null",
+        "shield": "string | null",
+        "armor": "string | null",
+        "ring1": "string | null",
+        "ring2": "string | null"
+      },
       "status": "\"vivo\" | \"morto_aguardando_respawn\""
     }
   ],
@@ -119,12 +127,12 @@ Duas camadas complementares:
 
 ### Invariantes do schema
 
-- `position_atual` pode ultrapassar `base_position` durante combate (pool temporário somado). Ao encerrar: `position_atual = min(base_position, position_atual)` — ver Mecanicas.md §1 Position.
+- `position_atual` pode ultrapassar `base_position` durante combate (pool temporário somado). Ao encerrar: pool é consumido primeiro; o que sobra do pool (não usado em dano) é descontado. Ver §4 "Encerrar combate" para fórmula completa.
 - `almas_coletadas` vai a zero ao morrer; `almas_marca_de_sangue` recebe o valor salvo; `almas_bancadas` nunca se perde.
 - `estus_max` derivado da tabela (Mecanicas.md §3 Estus Flask): níveis 1–4 → 3, 5–9 → 4, 10–16 → 5, 17–20 → 6.
 - `pool_inicial_combate` é vazio `{}` quando `combate.ativo == false`. Ao iniciar combate, só PCs com `status == "vivo"` recebem entrada.
 - `pool_inicial_combate[pc_id]` é imutável durante o combate — usado para o limiar de Bloodied e para exibição de "Position temporária" nas vistas.
-- Bloodied (Mecanicas.md §1): só calculado quando `combate.ativo == true`. Limiar = `pool_inicial_combate[pc_id] × 0.5`. Ativo quando `position_atual ≤ limiar`.
+- Bloodied (Mecanicas.md §1): só calculado quando `combate.ativo == true`. Limiar = `(base_position + pool_inicial_combate[pc_id]) × 0.5` ("starting Position pool" RAW EN p.124 = base + temporária). Ativo quando `position_atual ≤ limiar`.
 - Inimigo sem `bestiario_ref` correspondente: painel exibe placeholder com alerta — não quebra.
 - Inimigo com fases: ao `position_atual` cruzar `bloodied_em` (descendo), `fase_atual` avança automaticamente; ao subir de volta, NÃO regride (decisão narrativa do mestre).
 - Stats estáticos (ac, atributos, ações, traços) vêm do bestiário via lookup; estado dinâmico é só o que está no schema acima.
@@ -273,9 +281,15 @@ Duas camadas complementares:
 ### Layout geral
 
 Três seções verticais:
-1. **PCs** — 4 cards em linha (ou 2×2)
+1. **PCs** — 4 cards em linha (`repeat(4, 1fr)`), sem portrait, layout vertical compacto. Foco em densidade operacional: todos os campos editáveis visíveis sem scroll no notebook (1366px+).
 2. **Inimigos** — lista expandível
 3. **Controles de combate** — barra inferior
+
+### Card de PC — layout
+
+Sem portrait. Layout vertical: nome/classe/badges → separador → atributos 6-col → separador → stat-rows compactas (AC, Position, Estus, Almas, Mortes) → botões de ação → separador → slots de equipamento (5 slots em linha, ~36px) → efeitos.
+
+Slots de equipamento ficam na parte inferior do card, antes do bloco de efeitos. Equipment effects e Bloodied effects seguem imediatamente após.
 
 ### Card de PC
 
@@ -291,7 +305,7 @@ Três seções verticais:
 | Contador de mortes | exibição + ação | botão "Marcar morte" desabilitado se `mortes == 3` |
 | Marca de sangue | toggle | ativa/desativa manualmente |
 | Status | exibição | `vivo` ou indicador de respawn pendente |
-| Badge Bloodied | derivado, só em combate | acende quando `position_atual ≤ pool_inicial_combate[id] × 0.5` |
+| Badge Bloodied | derivado, só em combate | acende quando `position_atual ≤ (base_position + pool_inicial_combate[id]) × 0.5` |
 
 **Ações por PC:**
 
@@ -355,13 +369,32 @@ Ação global: **+ Adicionar do bestiário** abre modal com lista de bestiário;
 3. Ao confirmar: `pool_inicial_combate[id] = valor`; `position_atual += valor`; `combate.ativo = true`
 
 **Encerrar combate** (habilitado somente quando `combate.ativo == true`):
-1. Para cada PC: `position_atual = min(base_position, position_atual)` — ver Mecanicas.md §1
+1. Para cada PC (modelo "pool consumido primeiro"):
+   - `startingPool = base_position + pool_inicial_combate[id]`
+   - `poolUsado = max(0, startingPool − position_atual)`
+   - `poolNaoUsado = max(0, pool_inicial_combate[id] − poolUsado)`
+   - `position_atual = max(0, position_atual − poolNaoUsado)`
+   - Exemplos: 10/7 pool5 → 7 | 7/7 pool5 → 7 | 6/7 pool5 → 6
 2. Limpa `pool_inicial_combate`
 3. `combate.ativo = false`
 
 ---
 
 ## 5. Vista Jogadores
+
+### Layout geral
+
+2×2 (`repeat(2, 1fr)`), padding 18px. Cada card usa layout horizontal: coluna esquerda (28% — portrait + slots) + coluna direita (stats). Portrait: 160×240px (proporção 2:3, fixo). Slots: ~42px em grid 5×1. Estética cuidada, legível a 2–3 m em 1080p sem scroll.
+
+Tamanhos de fonte reduzidos ~20-25% em relação ao mockup original:
+
+| Elemento | Valor |
+|---|---|
+| Nome PC | 32px |
+| Vital stats (Position/Estus) | 40px |
+| Atributos | 18px |
+| AC | 26px |
+| Card padding | 18px |
 
 ### Campos exibidos por PC
 
@@ -430,7 +463,7 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 | Recuperar marca fora do local | Painel não valida proximidade física da marca. Premissa: mestre só aciona a ação quando o PC alcançou narrativamente o local de morte. |
 | Segunda morte sem recuperar marca | `mortes++`; lote anterior de `almas_marca_de_sangue` sobrescrito e perdido; `almas_marca_de_sangue` recebe o valor de `almas_coletadas` da segunda morte; `almas_coletadas = 0`; `marca_de_sangue_ativa` permanece `true` (nova marca no novo local) |
 | `mortes == 3` | Badge visual de permadeath iminente; botão "Marcar morte" desabilitado — permadeath é decisão narrativa do mestre, registrada fora do painel |
-| Encerrar combate com position acima da base | `position_atual = min(base_position, position_atual)` — regra do livro (Mecanicas.md §1) |
+| Encerrar combate com position acima da base | Pool consumido primeiro; poolNaoUsado é descontado. Ex: 10/7 pool5 → 7. Ver §4 fórmula completa. |
 | Encerrar combate sem ter iniciado | Botão desabilitado; nenhuma ação |
 | Recuperar marca sem marca ativa | Botão desabilitado |
 | TPK | Mestre marca morte em cada PC individualmente; encerra combate manualmente |
@@ -454,21 +487,24 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 
 ## 9. Critério de "pronto pra sessão 1"
 
-- [ ] `?view=master` abre e carrega estado do localStorage automaticamente
-- [ ] `?view=players` abre e recebe atualizações em tempo real via BroadcastChannel
-- [ ] Todos os campos dos 4 PCs são editáveis na vista mestre
-- [ ] Iniciar combate abre modal para digitar pools temporários de todos os PCs vivos
-- [ ] Encerrar combate reverte `position_atual` para `min(base_position, position_atual)`
-- [ ] Bloodied calculado e exibido em ambas as vistas somente durante combate
-- [ ] "Marcar morte", "Recuperar marca" e "Retornar ao combate" funcionam conforme o edge case §7
-- [ ] Inimigos: campos de nome, position atual/máx e nota editáveis; + Adicionar; Remover com confirmação
-- [ ] Position máxima dos inimigos visível somente na vista mestre
-- [ ] Exportar JSON funcional (download de blob)
+- [x] `?view=master` abre e carrega estado do localStorage automaticamente
+- [x] `?view=players` abre e recebe atualizações em tempo real via BroadcastChannel
+- [x] Todos os campos dos 4 PCs são editáveis na vista mestre
+- [x] Iniciar combate abre modal para digitar pools temporários de todos os PCs vivos
+- [x] Encerrar combate reverte `position_atual` para `min(base_position, position_atual)`
+- [x] Bloodied calculado e exibido em ambas as vistas somente durante combate
+- [x] "Marcar morte", "Recuperar marca" e "Retornar ao combate" funcionam conforme o edge case §7
+- [x] Inimigos: campos de nome, position atual/máx e nota editáveis; + Adicionar; Remover com confirmação
+- [x] Position máxima dos inimigos visível somente na vista mestre
+- [x] Exportar JSON funcional (download de blob)
 - [ ] Carregar JSON funcional (com confirmação ao sobrescrever)
-- [ ] Vista jogadores não exibe inimigos nem controles
-- [ ] Estética Dark Souls aplicada na vista jogadores; legível a 2–3 m em 1080p
-- [ ] `bestiario.json` é carregado no startup; falha exibe alerta sem quebrar painel
-- [ ] Os 4 inimigos da sessão 1 (3 Hollow Soldiers + Asylum Demon) aparecem pré-populados ao abrir o painel pela primeira vez (estado vazio)
-- [ ] bloodied_origens.json carrega; cards em Bloodied mostram efeitos da origem
-- [ ] Atributos afetados ficam amarelos com transição `15 → 17` visível
-- [ ] AC em Bloodied (Brute, Caster, Jack) também mostra transição visual
+- [x] Vista jogadores não exibe inimigos nem controles
+- [x] Estética Dark Souls aplicada na vista jogadores; legível a 2–3 m em 1080p
+- [x] `bestiario.json` é carregado no startup; falha exibe alerta sem quebrar painel
+- [x] Os 4 inimigos da sessão 1 (3 Hollow Soldiers + Asylum Demon) aparecem pré-populados ao abrir o painel pela primeira vez (estado vazio)
+- [x] bloodied_origens.json carrega; cards em Bloodied mostram efeitos da origem
+- [x] Atributos afetados ficam amarelos com transição `15 → 17` visível
+- [x] AC em Bloodied (Brute, Caster, Jack) também mostra transição visual
+- [ ] Efeitos de equipamento são exibidos no card (depende de equipamento.json + lógica de aplicação)
+
+**Itens pendentes promovidos pra backlog (ver `spec_ideias_projeto.md`). Não bloqueiam sessão 1.**

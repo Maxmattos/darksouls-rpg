@@ -15,7 +15,9 @@ export function isBloodied(pc, combate) {
   if (!combate.ativo) return false;
   const pool = combate.pool_inicial_combate[pc.id];
   if (pool == null) return false;
-  return pc.position_atual <= pool * 0.5;
+  // "starting Position pool" RAW (EN p.124) = base + pool temporária
+  const startingPool = pc.base_position + pool;
+  return pc.position_atual <= startingPool * 0.5;
 }
 
 export function bloodiedEfeitos(pc, origens) {
@@ -124,9 +126,12 @@ function initCombat(state, { pools }) {
 function endCombat(state) {
   const s = deepClone(state);
   for (const pc of s.pcs) {
-    if (pc.status === 'vivo') {
-      pc.position_atual = Math.min(pc.base_position, pc.position_atual);
-    }
+    if (pc.status !== 'vivo') continue;
+    const pool = s.combate.pool_inicial_combate[pc.id] || 0;
+    const startingPool = pc.base_position + pool;
+    const poolUsado = Math.max(0, startingPool - pc.position_atual);
+    const poolNaoUsado = Math.max(0, pool - poolUsado);
+    pc.position_atual = Math.max(0, pc.position_atual - poolNaoUsado);
   }
   s.combate.ativo = false;
   s.combate.pool_inicial_combate = {};

@@ -40,6 +40,33 @@ Itens fora do escopo da sessão 1. Priorizar antes da sessão em que forem neces
 
 ---
 
+### Bug: Carregar JSON não responde
+
+**Status:** identificado durante testes da v1; deixado de fora da sessão 1 porque export funciona (snapshot final basta).
+
+**Hipótese:** handler do botão pode estar quebrado pela mudança de label/input ou pelo `e.preventDefault()` no listener.
+
+**Investigar:** `main.js` — listener do `lbl-import`, verificar se o `input[type=file]` está sendo clicado corretamente. Pode ser que o `label` envolva o input e o click esteja sendo capturado errado.
+
+**Prioridade:** antes da sessão 2 (para poder restaurar estado entre sessões via JSON).
+
+---
+
+### Efeitos de equipamento aplicados no card
+
+**Status:** schema tem campo `equipamento: { sword, shield, armor, ring1, ring2 }` (todos null), UI já exibe os 5 slots vazios. Falta:
+
+1. Criar `equipamento.json` na raiz — catálogo de itens com nome, tipo de slot, e efeitos estruturados (ex: `+2 AC`, `+1 DEX`, `"vantagem em saves de Força"`).
+2. Modal de seleção de item por slot (similar ao "+ Adicionar do bestiário", filtrado por tipo de slot).
+3. Lógica em `logica.js`: AC efetiva = `ac_base + ac_de_equipamento + ac_de_bloodied`. Atributos modificados por equipamento somam ao base antes do Bloodied.
+4. Renderizar lista de efeitos ativos no bloco "EQUIPMENT EFFECTS" do card, lendo `pc.equipamento` + `equipamento.json`.
+
+**Nota:** a entrada "Slots de equipamento do PC" mais abaixo cobre o backlog visual (imagens de item). Esta entrada cobre exclusivamente a lógica de efeito.
+
+**Prioridade:** quando os PCs adquirirem o primeiro item com efeito mecânico significativo (provavelmente sessão 2–3).
+
+---
+
 ### Level up mid-sessão
 
 **Contexto:** level up é decisão do jogador, não do mestre — acontece quando o PC banca as almas na fogueira. O painel pode facilitar sem se tornar uma trava.
@@ -114,3 +141,20 @@ Itens fora do escopo da sessão 1. Priorizar antes da sessão em que forem neces
 - Input de iniciativa por criatura (DC + resultado da rolagem)
 - Exibição da ordem: Fast (acima da DC) → Slow (abaixo)
 - Botão "Próximo turno" avança para a próxima criatura na lista
+
+---
+
+### Slots de equipamento do PC
+
+**Contexto:** painel hoje mostra atributos e Bloodied effects. Faltam os itens equipados (Dark Souls clássico): espada / escudo / armadura / anel 1 / anel 2.
+
+**Comportamento desejado:**
+- 5 slots visuais no card de PC (vista mestre E jogadores).
+- Quadrados/retângulos com imagem do item ou placeholder.
+- Cada item tem efeito ativo (texto curto) exibido abaixo dos atributos, antes dos efeitos de Bloodied.
+- Separador visual entre "efeitos de item" e "efeitos de Bloodied".
+- Edição via modal do mestre (escolher do `equipamento.json`).
+
+**Dependência:** criar `equipamento.json` (catálogo de itens com imagem, tipo, efeito).
+
+**Prioridade:** quando os PCs adquirirem itens com efeito ativo significativo (provavelmente após sessão 2–3).
