@@ -17,9 +17,23 @@ Dois dispositivos físicos simultâneos:
 
 ## 2. Arquitetura
 
+### Estrutura de arquivos
+
+Separação por responsabilidade: HTML para estrutura, CSS para apresentação, JS modular por domínio (estado/lógica/render/io). Mantém zero dependências externas e execução via file://.
+
+```
+painel_mestre.html    Estrutura HTML mínima + links pra CSS e scripts
+css/painel.css        Toda a paleta, layout, estados visuais
+js/estado.js          defaultState, load/save localStorage, dispatch
+js/logica.js          Bloodied, combate, morte, fases, attrMod, estusMax
+js/render.js          renderMaster, renderPlayers, render de cards
+js/io.js              fetch dos JSONs, BroadcastChannel, export/import
+js/main.js            init() — orquestra tudo, detecta ?view, primeiro render
+```
+
 ### Vistas
 
-Um único arquivo `painel_mestre.html`. Vista selecionada por query string:
+Vista selecionada por query string:
 
 | URL | Quem usa | Modo |
 |---|---|---|

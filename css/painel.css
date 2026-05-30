@@ -1,0 +1,755 @@
+/* ========================================================
+   Dark Souls RPG — Painel do Mestre
+   Target: notebook (1080p) + TV via HDMI (1080p/4K)
+   ======================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg:               #0a0a0a;
+  --bg-card:          #111111;
+  --bg-card-alt:      #161616;
+  --text:             #e8dcc8;
+  --text-dim:         #9a8f7e;
+  --brasa:            #c94f1e;
+  --brasa-bg:         rgba(201, 79, 30, 0.18);
+  --dourado:          #c9a84c;
+  --dourado-bg:       rgba(201, 168, 76, 0.12);
+  --vermelho-sangue:  #8b0000;
+  --vermelho-morto:   #5a0000;
+  --borda:            #2a2a2a;
+  --borda-hover:      #444444;
+  --cinza-morto:      #555555;
+  --verde-ok:         #3a7a3a;
+  --font-serif:       Georgia, 'Times New Roman', serif;
+  --font-sans:        system-ui, -apple-system, sans-serif;
+  --radius:           6px;
+  --shadow:           0 2px 8px rgba(0,0,0,0.6);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ---- Views ---- */
+
+.view { min-height: 100vh; }
+
+/* ========================================================
+   VISTA MESTRE
+   ======================================================== */
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #0d0d0d;
+  border-bottom: 1px solid var(--borda);
+  gap: 16px;
+}
+
+.session-info {
+  display: flex;
+  gap: 16px;
+  font-family: var(--font-serif);
+  color: var(--dourado);
+  font-size: 13px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Main layout */
+main {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+section { display: flex; flex-direction: column; gap: 8px; }
+
+h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--dourado);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Cards grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 1100px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---- Botões genéricos ---- */
+
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  background: #1e1e1e;
+  color: var(--text);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+button:hover:not(:disabled), .btn:hover {
+  border-color: var(--borda-hover);
+  background: #252525;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+button.btn-danger { color: var(--brasa); border-color: var(--brasa); }
+button.btn-danger:hover:not(:disabled) { background: rgba(201,79,30,0.12); }
+
+button.btn-primary { color: var(--dourado); border-color: var(--dourado); }
+button.btn-primary:hover:not(:disabled) { background: var(--dourado-bg); }
+
+/* Input disfarçado de botão */
+.btn input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+#lbl-import { position: relative; cursor: pointer; }
+
+/* ---- Inputs numéricos ---- */
+
+input[type="number"], input[type="text"], textarea {
+  background: #1a1a1a;
+  color: var(--text);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 3px 6px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  width: 100%;
+}
+
+input[type="number"] { width: 64px; text-align: center; }
+
+input[type="number"]:focus, input[type="text"]:focus, textarea:focus {
+  outline: 1px solid var(--dourado);
+  border-color: var(--dourado);
+}
+
+textarea { resize: vertical; min-height: 48px; }
+
+/* ---- Card de PC (vista mestre) ---- */
+
+.card-pc {
+  background: var(--bg-card);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.card-pc.bloodied {
+  background: var(--brasa-bg);
+  border-color: var(--brasa);
+}
+
+.card-pc.morto {
+  filter: grayscale(1);
+  border-color: var(--vermelho-sangue);
+}
+.card-pc.morto .you-died-overlay { filter: none; }
+.card-pc.morto .you-died-text { filter: none; }
+
+.card-pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.card-pc-nome {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--dourado);
+  font-weight: bold;
+}
+
+.card-pc-classe {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-bloodied { background: var(--brasa); color: #fff; }
+.badge-morte { background: var(--vermelho-sangue); color: #fff; }
+.badge-marca { background: #4a2a00; color: var(--dourado); border: 1px solid var(--dourado); }
+.badge-permadeath { background: #3a0000; color: #ff6666; border: 1px solid #ff6666; }
+
+/* Atributos */
+.atributos-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.attr-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1a1a1a;
+  border: 1px solid var(--borda);
+  border-radius: 3px;
+  padding: 2px 5px;
+  min-width: 36px;
+}
+
+.attr-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; }
+.attr-val { font-size: 12px; font-weight: bold; }
+.attr-val.bloodied-changed { color: var(--dourado); }
+
+/* Position + Estus + Almas */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  min-width: 80px;
+}
+
+.stat-value-display {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.position-temp {
+  font-size: 11px;
+  color: var(--brasa);
+}
+
+/* Contador de mortes */
+.mortes-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mortes-pips {
+  display: flex;
+  gap: 4px;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--text-dim);
+  background: transparent;
+}
+
+.pip.ativo { background: var(--vermelho-sangue); border-color: var(--vermelho-sangue); }
+
+/* YOU DIED overlay */
+.you-died-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.you-died-text {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--vermelho-sangue);
+  text-shadow: 0 0 12px rgba(139,0,0,0.8);
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
+
+/* Ações do card PC */
+.card-pc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.card-pc-actions button { font-size: 11px; padding: 3px 8px; }
+
+/* Efeitos Bloodied textuais */
+.bloodied-efeitos {
+  font-size: 11px;
+  color: var(--text-dim);
+  padding-left: 8px;
+  border-left: 2px solid var(--brasa);
+}
+
+.bloodied-efeitos li { margin: 2px 0; }
+
+/* ---- Card de Inimigo (vista mestre) ---- */
+
+.card-inimigo {
+  background: var(--bg-card);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.card-inimigo.bloodied { border-color: var(--brasa); background: var(--brasa-bg); }
+.card-inimigo.morto-inimigo { border-color: var(--vermelho-morto); background: rgba(90,0,0,0.18); }
+
+.card-inimigo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-inimigo-header:hover { background: rgba(255,255,255,0.03); }
+
+.inimigo-nome-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--borda);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font-serif);
+  padding: 2px 0;
+}
+
+.inimigo-nome-input:focus { outline: none; border-bottom-color: var(--dourado); }
+
+.inimigo-position-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.inimigo-position-wrap input[type="number"] { width: 52px; }
+
+.btn-toggle-inimigo {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.btn-remove-inimigo {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.btn-remove-inimigo:hover { color: var(--brasa); }
+
+.card-inimigo-body {
+  padding: 8px 12px 12px;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-inimigo-body.collapsed { display: none; }
+
+.inimigo-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 4px 12px;
+  font-size: 12px;
+}
+
+.inimigo-stat { display: flex; gap: 6px; }
+.inimigo-stat-label { color: var(--text-dim); }
+
+.fases-list { font-size: 12px; }
+.fase-item { padding: 4px 6px; border-radius: 3px; margin: 2px 0; }
+.fase-item.ativa { background: var(--dourado-bg); border-left: 3px solid var(--dourado); }
+
+.acoes-list { display: flex; flex-direction: column; gap: 4px; }
+.acao-item {
+  font-size: 12px;
+  background: #1a1a1a;
+  border: 1px solid var(--borda);
+  border-radius: 3px;
+  padding: 4px 8px;
+}
+
+.acao-nome { font-weight: bold; color: var(--dourado); }
+
+.fase-actions { display: flex; gap: 6px; }
+
+.narrativa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 32px;
+}
+
+.narrativa-box {
+  background: var(--bg-card);
+  border: 1px solid var(--dourado);
+  border-radius: var(--radius);
+  max-width: 640px;
+  padding: 24px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text);
+  position: relative;
+}
+
+.narrativa-box button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* ---- Combate bar (footer) ---- */
+
+.combat-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #0d0d0d;
+  border-top: 1px solid var(--borda);
+  gap: 16px;
+}
+
+.combat-status { font-family: var(--font-serif); color: var(--dourado); font-size: 13px; }
+.combat-actions { display: flex; gap: 8px; }
+
+/* ========================================================
+   VISTA JOGADORES
+   ======================================================== */
+
+#view-players {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.players-header {
+  text-align: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.players-header h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  color: var(--dourado);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#players-pcs-grid {
+  padding: 16px;
+  flex: 1;
+}
+
+/* Card PC — vista jogadores: tamanho grande legível a 2-3m */
+
+.card-pc-player {
+  background: var(--bg-card);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.card-pc-player.bloodied {
+  background: var(--brasa-bg);
+  border-color: var(--brasa);
+}
+
+.card-pc-player.morto {
+  filter: grayscale(1);
+  border-color: var(--vermelho-sangue);
+}
+.card-pc-player.morto .you-died-text-player { filter: none; }
+
+.player-nome {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2.2vw, 32px);
+  color: var(--dourado);
+  font-weight: bold;
+}
+
+.player-classe {
+  font-size: clamp(12px, 1.2vw, 18px);
+  color: var(--text-dim);
+}
+
+.player-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.player-stat-label {
+  font-size: clamp(11px, 1vw, 16px);
+  color: var(--text-dim);
+  min-width: 90px;
+}
+
+.player-stat-val {
+  font-size: clamp(24px, 2.5vw, 40px);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.player-stat-sep {
+  font-size: clamp(14px, 1.5vw, 22px);
+  color: var(--text-dim);
+}
+
+.player-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.player-badges .badge {
+  font-size: clamp(12px, 1.1vw, 18px);
+  padding: 4px 12px;
+}
+
+.player-atributos {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.player-attr-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1a1a1a;
+  border: 1px solid var(--borda);
+  border-radius: 3px;
+  padding: 4px 8px;
+  min-width: 44px;
+}
+
+.player-attr-label { font-size: clamp(9px, 0.8vw, 13px); color: var(--text-dim); text-transform: uppercase; }
+.player-attr-val { font-size: clamp(16px, 1.6vw, 26px); font-weight: bold; }
+.player-attr-val.bloodied-changed { color: var(--dourado); }
+
+.player-bloodied-efeitos {
+  font-size: clamp(12px, 1.1vw, 17px);
+  color: var(--text-dim);
+  padding-left: 10px;
+  border-left: 3px solid var(--brasa);
+}
+
+.player-bloodied-efeitos li { margin: 3px 0; }
+
+.player-mortes-pips {
+  display: flex;
+  gap: 6px;
+}
+
+.player-pip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--text-dim);
+  background: transparent;
+}
+
+.player-pip.ativo { background: var(--vermelho-sangue); border-color: var(--vermelho-sangue); }
+
+.you-died-text-player {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 4vw, 60px);
+  font-weight: bold;
+  color: var(--vermelho-sangue);
+  text-shadow: 0 0 20px rgba(139,0,0,0.9);
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.player-position-temp {
+  font-size: clamp(13px, 1.2vw, 19px);
+  color: var(--brasa);
+}
+
+/* Sync alert */
+.sync-alert {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3a2a00;
+  border: 1px solid var(--dourado);
+  color: var(--dourado);
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+/* ========================================================
+   MODAIS
+   ======================================================== */
+
+dialog {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  max-width: 480px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+}
+
+dialog::backdrop {
+  background: rgba(0,0,0,0.75);
+}
+
+dialog h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+dialog p { margin: 0 0 12px; font-size: 13px; color: var(--text-dim); }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-combate-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--borda);
+  gap: 12px;
+}
+
+.modal-combate-field:last-child { border-bottom: none; }
+
+.modal-combate-label { font-size: 13px; }
+
+.bestario-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border: 1px solid var(--borda);
+  border-radius: 3px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.bestario-item:hover { border-color: var(--dourado); }
+
+.bestario-item-nome { font-family: var(--font-serif); color: var(--dourado); }
+.bestario-item-tipo { font-size: 11px; color: var(--text-dim); }
+
+/* Arma seletor */
+.arma-select {
+  background: #1a1a1a;
+  color: var(--text);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
+/* Transição atributo bloodied: "15 → 17" */
+.attr-arrow { color: var(--text-dim); margin: 0 2px; font-size: 0.85em; }
+.attr-new-val { color: var(--dourado); }
+
+/* 4K scaling */
+@media (min-width: 2560px) {
+  html { font-size: 18px; }
+  .player-stat-val { font-size: clamp(36px, 2.2vw, 56px); }
+}
