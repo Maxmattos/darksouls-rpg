@@ -24,29 +24,67 @@
 
 | Horário | Ato | Duração | Conteúdo                                                     |
 |---|---|---|--------------------------------------------------------------|
-| 19:00–19:10 | **0** | 10 min | Abertura espiritual em Drangleic + a queda                   |
-| 19:10–19:30 | **1a** | 20 min | Despertar nas celas, a chave de Nish, exploração (sem luta)  |
-| 19:30–20:15 | **1b** | 45 min | **Combate-tutorial:** 3 Hollow Soldiers (ensina tudo)        |
-| 20:15–20:35 | **2** | 20 min | **Respiro:** acender a fogueira, descanso, banco de almas    |
-| 20:35–21:25 | **3** | 50 min | **Asylum Demon** (versão tutorial) + teste da regra de morte |
-| 21:25–21:45 | **4** | 20 min | Nish no penhasco, o sono arcano, reveal de Majula            |
-| 21:45–22:00 | — | 15 min | Feedback e discussão                                         |
+| 19:00–19:25 | **0** | 25 min | Abertura espiritual + flashbacks individuais + a queda       |
+| 19:25–19:40 | **1a** | 15 min | Despertar nas celas, a chave de Nish, exploração             |
+| 19:40–20:25 | **1b** | 45 min | **Combate-tutorial:** 3 Hollow Soldiers                      |
+| 20:25–20:40 | **2** | 15 min | **Respiro:** fogueira, descanso, banco de almas              |
+| 20:40–21:30 | **3** | 50 min | **Asylum Demon** + teste da regra de morte                   |
+| 21:30–22:00 | **4** | 30 min | Nish no penhasco, sono arcano, reveal de Majula              |
 
 > **Triagem se estiver atrasado:** o combate-tutorial é o que mais incha. Se às **20:15** ele ainda não acabou, narre os Hollows restantes caindo rápido ("eles recuam, exaustos") e siga. Proteja o tempo do chefe — é o coração da sessão.
 
 ---
 
-## 🌌 ATO 0 — O Eco do Trono Perdido (19:00–19:10)
-🎵 *Música: longing(DS2) até 2:10*
+## 🌌 ATO 0 — O Eco do Trono Perdido (19:00–19:25)
+🎵 *Música: longing (DS2) até 2:10*
 
 > *Não há corpo. Não há peso. Você caminha — ou flutua — por passarelas de pedra suspensas na névoa, e ao redor erguem-se torres góticas e cachoeiras que despencam para um vazio sem fundo. Isto foi um reino. Drangleic, sussurra algo dentro de você, embora você não saiba como sabe o nome. Houve glória aqui. Agora há só o silêncio de algo grande demais que ruiu.*
 
 **Beats:**
-- Faça uma volta rápida pela mesa: cada jogador descreve **uma coisa** que sente ou nota como alma sem corpo. Ancora os quatro sem exigir ficha ainda. (~1 min cada)
-- **O Lorde Caído:** ao fim da passarela, uma silhueta imensa observa o horizonte. Ela se vira. Profere **uma palavra antiga** (não traduza — é gutural, ressonante). A realidade racha.
+- Volta rápida pela mesa: cada jogador descreve **uma coisa** que sente como alma sem corpo. (~1 min cada)
+- **Os Flashbacks.** A passarela se dissolve. Cada PC é puxado para uma visão da própria vida passada. Antes de narrar cada flashback, **pergunte ao jogador: "o que você vê? o que você sente?"** — incorpore a resposta dele no primeiro beat. Cada PC vive o próprio flashback em silêncio; os outros assistem.
+- **O Lorde Caído:** ao retornar à passarela, uma silhueta imensa observa o horizonte. Ela se vira. Profere **uma palavra antiga** (não traduza — é gutural, ressonante).
 - **A Queda:** o chão some. Eles despencam no escuro, "puxados" de volta à carne.
 
-*Conexão de lore (Ideia #4): os Unkindled veem Drangleic no plano espiritual ao despertar. Esta é essa visão. O Lorde Caído pode ser o próprio Nish — ou um eco dele. Deixe ambíguo.*
+### Flashbacks individuais (~2 min cada, narrar em silêncio à mesa)
+
+**ZARKOV — "a mesma mão"**
+
+> *Você é criança. Há uma flor de campo na sua mão estendida. Sua mãe sorri para algo atrás de você, sem olhar para a flor.*
+>
+> *Corte.*
+>
+> *Você é adulto. Encapuzado. Está segurando a mesma mão dela. A mão está fria. Há sangue na lâmina caída ao seu lado, e você não consegue lembrar se foi você. Talvez tenha sido. Talvez sempre tenha sido.*
+
+**MARIN — "o nome dentro da caixa"**
+
+> *Você é pequeno. Um homem de armadura — seu pai — guia suas mãos sobre o cabo de uma espada curta. Ele ri quando você quase a deixa cair. Mais tarde, à luz da lua, sua mãe penteia seu cabelo prateado e sussurra um nome — o seu nome verdadeiro. (Aos outros jogadores: vocês não escutam.)*
+>
+> *Corte.*
+>
+> *Escuro. Madeira fechada ao seu redor. Você não sabe se está respirando. Não sabe se está vivo. Não sabe quem fechou a tampa, nem se a fechou contra você ou por você. Só sabe que está aqui — e que ficou.*
+
+**ELVYRA — "o último sol"**
+
+> *Você é criança correndo num campo aberto. O sol está alto, dourado, quente nas costas. Você ri. É o último dia em que você vai sentir o sol assim — mas você ainda não sabe disso.*
+>
+> *Corte.*
+>
+> *Você é adulta. Olha pra cima. O céu é uma chapa cinza permanente. E você compreende, em silêncio, sozinha, que o sol parou de nascer há muito tempo. Ninguém mais notou. Só você.*
+
+**DRAKAR — "a fileira que não estava lá"**
+
+> *Você atravessa uma fronteira de luz para o Abismo. Atrás de você, uma fileira de companheiros sussurra um juramento. Você sente cada voz nas costas, como mãos te empurrando para a frente. Sua chama no peito arde forte.*
+>
+> *Corte.*
+>
+> *Você sai do Abismo. Anos depois — você não sabe quantos. A fronteira de luz está apagada. A fileira não está lá. Ninguém ficou esperando. E a chama no seu peito, agora, é só uma brasa que treme.*
+
+*Conexão de lore: os Unkindled veem Drangleic no plano espiritual ao despertar. Os flashbacks são fragmentos arrancados da vida anterior — não memórias completas, só sabores. O Lorde Caído pode ser o próprio Nish, ou um eco dele. Deixe ambíguo.*
+
+**Extras opcionais:**
+- 🔍 **descoberta passiva** Ao olhar para o reino, um PC nota uma torre específica que parece "puxar o olhar". *Função:* ancorar Drangleic como lugar real que voltarão a ver.
+- 💭 **eco de BG** A palavra do Lorde Caído ressoa diferente para cada um (Drakar nas mãos, Marin no peito, Zarkov nas costas, Elvyra na cicatriz). Sem explicar. *Função:* primeira faísca de que esse lugar os conhece.
 
 ---
 
@@ -63,32 +101,28 @@
 
 *Sem combate aqui. Deixe-os respirar, explorar e entender os controles antes da primeira luta.*
 
+**Extras opcionais:**
+- ⚄ **rolagem de mestre** Role 1d4 às escondidas — define em qual cela Nish destrava o alçapão superior primeiro (1=Drakar, 2=Elvyra, 3=Marin, 4=Zarkov). O PC sorteado sai antes; os outros saem em sequência conforme ele encontra a chave A5 no corredor e abre as celas. *Função:* eliminar arbitrariedade na escolha do "primeiro a sair" sem dar agência aos jogadores numa cena onde Nish é o agente.
+- 📜 **item inspecionável** Numa cela vizinha vazia, restos de uma armadura enferrujada e um diário de uma página com letra apagada: *"…o sino não toca mais. ninguém vem. esquecemos os nomes uns dos outros."* *Função:* lore ambiente, custo zero, peso emocional.
+- 🔍 **descoberta passiva** Marcas de unhas no chão de uma das celas formam, juntas, o desenho de um sol partido. *Função:* primeira referência visual que aparecerá de novo — não nomeie.
+
 ---
 
 ## ⚔️ ATO 1b — Combate-Tutorial: 3 Hollow Soldiers (19:30–20:15) 
 🎵 *Playlist Docs - Tensão batalha simples*
 
-Na curva do corredor, **3 Hollow Soldiers** barram o caminho. *Este é o combate onde você ensina o sistema inteiro.* Stat block no apêndice.
+Na curva do corredor, **3 Hollow Soldiers** barram o caminho. *Este é o combate onde você ensina o sistema inteiro.* Stats no painel.
 
-**Sequência didática (ensine na ordem):**
-1. **Iniciativa Fast/Slow:** cada PC rola d20 + mod contra a **DC de Iniciativa do Hollow Soldier (12)**. Igual ou acima = age **antes** (Fast); abaixo = **depois** (Slow). Entre os PCs, ordem livre — **incentive combos**.
-2. **Position como "vida":** explique que a Position Base é o quanto aguentam de pé; ao entrar em combate, cada um rola seus **dados de Position** (= nível × dado de origem) e soma como Position temporária para a luta. *(Veja a cola de Position no fim.)*
-3. **Ataque vs AC:** d20 + mod de ataque vs **AC 15** do Hollow. Acertou → rola dano.
-4. **Gastar Position (o coração do sistema):** +1 por ponto num teste/ataque; **mínimo de 5** para somar +5 de dano; +1,5m de movimento por ponto. Uma vez por turno, só em si mesmo, nunca para forçar crítico.
-5. **Flanqueamento / Backstab:** o Hollow Soldier tem **Fraqueza a Backstab** — ataque de quem ele não vê = **crítico**. Posicione Zarkov atrás e mostre o crítico. Lição: posição importa.
-
-### HOLLOW SOLDIER · *Morto-vivo Médio* · CR 1/4 (50 almas)
-- **AC** 15 · **Position** 22 (3d8+9) · **Velocidade** 6 m · **Iniciativa DC** 12 · Visão no escuro 9 m
-- STR 13(+1) · DEX 12(+1) · CON 16(+3) · INT 6(−2) · WIS 8(−1) · CHA 5(−3)
-- Imunidade a dano: veneno · Imunidade a condição: envenenado
-- **Fraqueza a Backstab:** ataque de quem ele não vê / por quem é surpreendido = **crítico**.
-- **Espada Enferrujada** — corpo a corpo: **+3**, alcance 1,5 m. *Acerto:* **5 (1d8+1)** cortante.
-- *(opcional)* **Alabarda** — corpo a corpo: +3, alcance **3 m**. *Acerto:* 6 (1d10+1) cortante.
-- *(opcional)* **Besta Leve** — à distância: +4, alcance 24/96 m. *Acerto:* 4 (1d8) perfurante.
+Use o combate-tutorial para introduzir, na ordem natural: iniciativa Fast/Slow, Position temporária, AC, gasto de Position e Backstab.
 
 **Recompensa:** 3 × 50 = **150 almas** ÷ 4 = **~38 cada**.
 
 > **Se quiser mais rápido:** comece com 2 Hollow Soldiers e um 3º que "desperta" na 2ª rodada (ensina reforço). **Se quiser mais difícil:** dê uma Alabarda (alcance 3m, 1d10+1) a um deles para ensinar alcance.
+
+**Extras opcionais:**
+- 🔍 **descoberta passiva** Um dos Hollow Soldiers porta uma espada com um brasão que Drakar **reconhece vagamente** — não dos seus, mas de alguém que lutou contra os seus. *Função:* eco de BG sem nome próprio; planta a guerra antiga entre anelados e prata.
+- ⚄ **rolagem** Após o combate, um PC pode rolar Sabedoria (Percepção) DC 12 para notar que um dos Hollows ainda respira — fraco, sem ameaça. Decisão da mesa: piedade ou golpe. *Função:* primeiro dilema ético de Souls, sem mecânica punitiva.
+- 📜 **item inspecionável** O machado de um dos Hollows tem uma inscrição apagada: *"para o filho que não voltou."* *Função:* peso humano nos inimigos descartáveis.
 
 ---
 
@@ -104,6 +138,10 @@ Na curva do corredor, **3 Hollow Soldiers** barram o caminho. *Este é o combate
 
 **Beat de mestre:** deixe-os sentir o alívio. *Então* mostre, adiante, a **névoa branca e densa** selando a grande sala quadrada. A calmaria antes do nome próprio.
 
+**Extras opcionais:**
+- 🗣 **fala ambígua** Ao tocar a fogueira pela primeira vez, cada PC ouve uma voz feminina sussurrar — não a Firekeeper de Majula, alguém mais distante. Cada um ouve uma palavra diferente, escolhida pelo mestre conforme o BG (sem nomes). *Função:* mistério individual; primeira semente de Dusk.
+- 🔍 **descoberta passiva** Há mais espadas espiraladas no chão ao redor da fogueira, gastas, sem chama. *Função:* "outros já estiveram aqui e não voltaram" — sem dizer.
+
 ---
 
 ## 👹 ATO 3 — O Carcereiro do Asilo (20:35–21:25) 
@@ -111,52 +149,21 @@ Na curva do corredor, **3 Hollow Soldiers** barram o caminho. *Este é o combate
 
 > *A névoa cede ao toque. Dentro, a câmara é vasta, quadrada, com um círculo de pedra gasta no centro. O teto range. Range de novo. E então desaba — uma massa imensa de músculo e ferro despenca no centro do círculo, erguendo poeira e cinzas, arrastando um martelo de pedra do tamanho de um homem. O Demônio do Asilo se ergue, e o chão treme sob seus pés.*
 
-### ASYLUM DEMON — versão tutorial
-*Chefe · Demônio Grande*
+Stats e fases no painel (bestiário → Asylum Demon).
 
-| | |
-|---|---|
-| **AC** | **14** (armadura natural) |
-| **Position** | **60** (Bloodied em **30**) |
-| **Velocidade** | 9 m |
-| **Iniciativa** | **Sempre age primeiro** (mantém o ícone) |
-| **Almas** | **1.800** (÷ 4 = **450 cada**) |
+### O Teste da Regra de Morte
 
-**STR** 16(+3) · **DEX** 15(+2) · **CON** 15(+2) · **INT** 9(−1) · **WIS** 11(+0) · **CHA** 11(+0)
-**Imunidade a dano:** veneno · **Resistência:** fogo, frio · **Imunidade a condição:** envenenado, enfeitiçado, inconsciente, agarrado
-**Visão no escuro 36 m**
+Mire a Investida no alvo mais exposto — provavelmente **Marin**. A intenção é derrubar 1 personagem para viverem a regra, sem TPK.
 
-**Traços**
-- **Visão Demoníaca.** Escuridão mágica não atrapalha sua visão.
-- **Resistência à Magia.** Vantagem em saves contra magia. *(Lição para Marin/Pyromancer: força bruta arcana não basta — pense.)*
+- **A 0 de Position:** corpo vira cinzas, alma volta à fogueira, almas coletadas caem como marca de sangue na arena.
+- **O dilema:** reentrar pela névoa reseta o Demônio para Fase 1, Position cheia. Esperar na fogueira e recuperar a marca após a vitória do time = susto sem custo permanente.
+- **Proteção de TPK:** se caírem dois ou mais, puxe os golpes. Contador 2 logo na estreia é péssimo.
 
-**FASE 1 — O Peso do Martelo (Position 60 → 31): UM ataque por turno.**
-Na Fase 1 ele escolhe **um** entre:
-- **Pancada no Chão** (cone de 4,5 m à frente). Save **CON 12**: na falha, 9 (2d6+2) contundente e **prone**; metade e de pé no sucesso.
-  - *Telegrafe:* descreva o martelo se erguendo no fim do turno anterior. Quem entender sai do cone.
-- **Investida de Martelo.** +5 vs alvo, alcance 3 m. *Acerto:* 8 (1d10+3) contundente.
-  - Acertou? Save **CON 12** ou ganha **Ferimento** (sangra 1d6 Position/turno, +1d6 por novo acerto). Estancar: ação + **SAB (Medicina) 12** ou cura mágica.
+**Vitória:** **1.800 almas** (÷4 = 450 cada). Portões ao sul se abrem.
 
-**FASE 2 — A Fúria (ao ficar Bloodied, Position ≤ 30): MULTIATAQUE.**
-Ao cruzar 30 de Position, ele ruge e enfurece. A partir daí faz **os dois ataques** (Pancada **e** Investida) no mesmo turno. *(Ensina a condição Bloodied: o chefe fica mais perigoso ferido — clássico DS.)*
-
-> **🔧 DIAL DE DIFICULDADE**
-> - **Mais fácil:** Position 45; Fase 2 ainda só 1 ataque.
-> - **Mais difícil:** Position 75; comece já com multiataque.
-> - **BRUTAL (original do livro):** AC 15, Position 90, multiataque desde o início, Pancada 2d8+2, ferimento 1d10. *Não recomendo contra nível 1 — alto risco de TPK.*
-
-### O TESTE DA REGRA DE MORTE (o momento que você quer que aconteça)
-
-Mire a Investida no alvo mais exposto/frágil — provavelmente **Marin** (Pyromancer, menor Position). A intenção é **derrubar 1 personagem** para vocês viverem a regra na pele, **sem TPK**.
-
-Quando um PC chega a 0 de Position:
-1. **Narre:** o corpo vira cinzas; a alma é puxada de volta à **fogueira do Ato 2** (atrás da névoa). As almas *coletadas* dele caem como **marca de sangue** no chão da arena.
-2. **O dilema (diga em voz alta):**
-   - **Reentrar na névoa enquanto o time luta** → o Demônio **reseta para a Fase 1, Position cheia.** Apaga o progresso de todos. *Quase nunca vale.*
-   - **Esperar na fogueira** → se o time **vence**, a névoa cai e ele entra e pega a marca de sangue **em segurança, contador volta a 0.** Susto sem dano permanente.
-3. **Proteja contra o TPK.** Se começarem a cair dois ou mais, **puxe os golpes** (o Demônio "hesita", mira em quem está de pé, erra de propósito). Um TPK joga o contador de todos para 2 — péssimo na estreia. A versão escalonada já reduz o risco; você é a última linha de segurança.
-
-**Vitória:** ao derrotá-lo, o grupo recebe **1.800 almas** (÷4) e os portões ao **sul** se abrem.
+**Extras opcionais:**
+- 🔍 **descoberta passiva (na arena, antes de o Demônio descer)** Há grilhões gigantes presos ao chão, partidos. *Função:* "isto estava preso aqui" — não explique.
+- 💭 **eco de BG (durante a luta)** Se Marin for atingido pela primeira vez, ele tem um lampejo de um homem cego de braços abertos. Não interrompe o turno. *Função:* sementinha do pai sem revelar.
 
 ---
 
@@ -176,14 +183,9 @@ Quando um PC chega a 0 de Position:
 
 **Subida de nível:** com as almas da sessão, todos cruzam o limiar do **nível 2** aqui. Termine com eles subindo de nível à luz da fogueira de Majula — o pagamento da estreia.
 
----
+Total da sessão: ~488 almas/pc → todos sobem ao nível 2 em Majula.
 
-## 📒 CONTABILIDADE DE ALMAS E NÍVEL
-
-| Fonte | Total | Por personagem (÷4) |
-|---|---|---|
-| 3 Hollow Soldiers (CR 1/4) | 150 | ~38 |
-| Asylum Demon (tutorial) | 1.800 | 450 |
-| **Total** | **1.950** | **~488** |
-
----
+**Extras opcionais:**
+- 🗣 **fala ambígua** Nish solta uma única frase quando o grupo se aproxima, sem se virar — escolha do mestre na hora entre: *"Vocês acordaram cedo demais para morrer de novo."* / *"A chave era só o começo."* / *"Já vi esse olhar antes. Em alguém que amei."* *Função:* mistério calibrado; sem reveal.
+- 💭 **eco de BG (silencioso)** Nish olha por um tempo longo para o rosto da Elvyra. Depois, para o corpo de Marin. Cego — mas os jogadores ainda não sabem que é cego. *Função:* foreshadow Balder/Marin sem nomes; pague nas próximas sessões.
+- 📜 **item inspecionável (em Majula, ao acordar)** No chão perto da fogueira, ao despertar, há uma pequena pedra plana com a letra "A" gasta — igual à chave do asilo. *Função:* fio de continuidade entre os dois lugares; quem é "A"?

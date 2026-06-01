@@ -17,3 +17,7 @@ trilha_sonora_rpg/
 
 # Battle Maps — ~78 MB total. Use Git LFS se quiser versionar no futuro.
 Battle Maps/
+
+# Prep pessoal — não versionar
+ideias/
+*.local.md
