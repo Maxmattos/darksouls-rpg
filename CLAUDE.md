@@ -64,7 +64,7 @@ RITMO E FORMATO DE SESSÃO
 
 IMAGENS: os jogadores respondem muito a imagens. Prompts são gerados nas
 conversas de prep (com contexto de cena) e formatados para o ChatGPT.
-Consultar `imagens/estilo_imagens.md` (a criar) para estilo global e lock
+Consultar `imagens/estilo_imagens.md` para estilo global e lock
 visual por personagem. No roteiro, marcar [IMG] onde a imagem entra.
 - Todo prompt de imagem orienta a IA a usar a referência oficial do local
   correspondente em Dark Souls.

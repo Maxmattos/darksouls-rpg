@@ -21,3 +21,9 @@ Battle Maps/
 # Prep pessoal — não versionar
 ideias/
 *.local.md
+
+# Imagens (binários não versionados)
+imagens/*.png
+imagens/*.jpg
+imagens/*.jpeg
+imagens/*.webp
