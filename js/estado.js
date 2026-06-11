@@ -133,7 +133,7 @@ function normalizePc(pc) {
   return { ...pc, ac_base, mods, equipamento: normalizeEquipamento(pc.equipamento) };
 }
 
-function normalizeState(s) {
+export function normalizeState(s) {
   if (s?.pcs) s.pcs = s.pcs.map(normalizePc);
   return s;
 }

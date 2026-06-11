@@ -1,5 +1,5 @@
-import { loadBestiario, loadBloodiedOrigens, loadItens, initChannel, subscribe, publish, exportJSON, importJSON } from './io.js';
-import { defaultState, loadState, saveState, setState, getState, dispatch, setOnChange } from './estado.js';
+import { loadBestiario, loadBloodiedOrigens, loadItens, initChannel, subscribe, publish, exportJSON, bindImport } from './io.js';
+import { defaultState, loadState, saveState, setState, getState, dispatch, setOnChange, normalizeState } from './estado.js';
 import { renderMaster, renderPlayers } from './render.js';
 
 let bestiario = {};
@@ -87,7 +87,7 @@ function bindMasterListeners() {
     }
   });
 
-  /* Inputs de texto: nome e nota — debounced para não disparar por tecla */
+  /* Input de texto do nome — debounced para não re-renderizar a cada tecla */
   document.getElementById('inimigos-list').addEventListener('input', (e) => {
     const el = e.target;
     const action = el.dataset.action;
@@ -98,8 +98,6 @@ function bindMasterListeners() {
     el._debounce = setTimeout(() => {
       if (action === 'set-nome-inimigo') {
         dispatch('SET_INIMIGO_FIELD', { inimigoId: id, field: 'nome_exibicao', value: el.value });
-      } else if (action === 'set-nota-inimigo') {
-        dispatch('SET_INIMIGO_FIELD', { inimigoId: id, field: 'nota', value: el.value });
       }
     }, 400);
   });
@@ -143,13 +141,11 @@ function bindMasterListeners() {
     exportJSON(getState());
   });
 
-  /* Import */
-  document.getElementById('lbl-import').addEventListener('click', (e) => {
-    e.preventDefault();
-    importJSON((newState) => {
-      openConfirmLoad(newState);
-    });
-  });
+  /* Import — listener ligado uma vez; o <label> abre o seletor nativamente */
+  bindImport((newState) => openConfirmLoad(newState));
+
+  /* Reset de sessão */
+  document.getElementById('btn-reset').addEventListener('click', resetSession);
 
   /* Modal confirm load */
   document.getElementById('modal-load-cancelar').addEventListener('click', () => {
@@ -294,11 +290,23 @@ function openConfirmLoad(newState) {
 function bindLoadConfirm() {
   document.getElementById('modal-load-ok').addEventListener('click', () => {
     if (_pendingLoadState) {
-      dispatch('LOAD_STATE', { newState: _pendingLoadState });
+      // Mesma normalização do localStorage: JSONs antigos (sem ac_base/mods/slots) migram.
+      dispatch('LOAD_STATE', { newState: normalizeState(_pendingLoadState) });
       _pendingLoadState = null;
     }
     document.getElementById('modal-confirm-load').close();
   });
+}
+
+/* ---- Reset de sessão ---- */
+
+function resetSession() {
+  if (!confirm('Resetar TODA a sessão para o padrão? Estado atual será perdido — exporte antes se quiser guardar.')) return;
+  const fresh = defaultState();
+  setState(fresh);
+  saveState(fresh);
+  publish(fresh);
+  render(fresh);
 }
 
 /* ---- Vista Jogadores ---- */

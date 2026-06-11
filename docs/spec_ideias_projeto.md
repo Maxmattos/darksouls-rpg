@@ -7,21 +7,32 @@ Atualizar conforme o projeto avança.
 
 ## Estado atual / ponto de retomada
 
-> **ÚLTIMA LEVA (concluída):** saves computados no card de inimigo (6 atributos, proficientes
-> em dourado); slots ativos do PC migrados para `mao_esq / mao_dir / armor / anel_esq /
-> anel_dir`; normalização de estado migrando localStorage antigo; fix do `ATTR_ORDER`
-> duplicado. Validado: tela volta a renderizar; saves aprovados.
+> **LEVA ANTERIOR (concluída e validada):** motor de efeitos sobre `itens.json` — equipar
+> recalcula AC com flash amarelo/seta (Marin: Robes → 11→13; + Caduceus → 14). `itens.json`
+> com os 4 itens do Marin modelados (`set`/`add`, perfil de arma, special).
 >
-> **VALIDAÇÃO VISUAL PENDENTE (fazer antes da próxima leva):** alinhamento vertical dos
-> saves (atributo sobre save na mesma coluna) e labels dos slots (MÃO ESQ/DIR · ANEL
-> ESQ/DIR) nas duas telas — não conferido porque a tela havia quebrado logo após.
+> **REORG DE REPOSITÓRIO (concluída):** estrutura em `data/`, `docs/`, `livros/`,
+> `img/itens/`; CLAUDE.md e .gitignore atualizados.
 >
-> **PRÓXIMA LEVA:** motor de efeitos sobre `itens.json` (Marin como cobaia). Validação ponta
-> a ponta: equipar Pyromancer Robes → AC 11→13 (amarelo+seta); + Caduceus Shield → 14;
-> desequipar escudo → volta a 13.
+> **LEVA DE ACABAMENTO (concluída):** padrão único "base → atual" (base branca, afetado
+> dourado) para AC e Bloodied, flash só no instante do equip/desequip; Equipment Effects
+> alimentado por item equipado (nome + especial; perfil para weapon/catalyst); layout dos
+> slots (master 5 selects largura total, TV abaixo da imagem) com imagem de `itens.json` +
+> fallback de abreviação.
 >
-> **Arquivo pronto, fora do commit até a próxima leva:** `itens.json` (4 itens do Marin
-> modelados com `set`/`add`, perfil de arma e special).
+> **ESTA LEVA (concluída e validada em Chrome):** persistência de sessão. (1) import de JSON
+> corrigido — o bug "não responde" era o `input.click()` reentrando pelo `<label>`; agora o
+> listener de `change` é ligado uma vez e o label abre o seletor nativamente; (2) import
+> passa pela mesma normalização do localStorage (`normalizeState`) — JSONs antigos sem
+> `ac_base`/`mods`/slots migram em vez de quebrar; (3) botão "Resetar sessão" (confirm
+> explícito → `defaultState`, limpa localStorage, re-render das duas vistas); (4) nota do
+> inimigo **removida por decisão de mesa** (matou junto o bug de foco do textarea); (5)
+> retrato do PC tenta `img/pcs/{id}.png` com fallback pro placeholder; pastas `saves/` e
+> `img/pcs/` versionadas. Ciclo equipar→exportar→resetar→importar→F5 validado; responsividade
+> da TV conferida em 1366/1600/1920/3840 (4 cards, sem scroll horizontal, sem sobreposição).
+>
+> **PRÓXIMA LEVA:** itens dos demais PCs (Zarkov, Drakar, Elvyra) e retratos — quando os
+> jogadores enviarem arte/fichas. Schema e motor já provados com o Marin.
 
 ---
 
@@ -43,10 +54,11 @@ Retro guiada pelo que atritou na mesa, não pelo backlog teórico. Ordem para a 
 
 **Mudou de forma / adiado**
 
-- Bug "Carregar JSON não responde" → absorvido pela persistência de sessão (P0 item 2).
-- Campo de **Nota do inimigo** → **consertar** o bug de foco (mantém o campo). Em uso na
-  Sessão 1 "deu mais problema que ajuda"; mesmo assim a anotação rápida é útil, então
-  arruma em vez de remover. Causa: a seção re-renderiza e recria o textarea focado.
+- Bug "Carregar JSON não responde" → **CORRIGIDO**: `input.click()` reentrava pelo `<label>`;
+  agora listener de `change` ligado uma vez + label nativo.
+- Campo de **Nota do inimigo** → **REMOVIDO por decisão de mesa**. "Deu mais problema que
+  ajuda" na Sessão 1; o bug de foco do textarea morreu junto. Anotação rápida fica fora
+  do painel.
 - **Rastreio de iniciativa** → posterior. Volta junto com o tema "notas/turno".
 - **Level up mid-sessão** → mantido no backlog; reavaliar quando o grupo bancar almas
   com Serelyn (fogueira de Majula).
@@ -239,11 +251,13 @@ de cadastrar os outros três.
 
 ## P0 — Persistência de sessão (salvar/carregar)
 
-**Status:** o antigo bug "Carregar JSON não responde" entra aqui. Export já funciona;
-o import é que está quebrado.
+**Status:** ✅ CONCLUÍDA. Export + import + reset funcionando, com normalização no import e
+persistência em localStorage (sobrevive a F5).
 
-**Hipótese do bug:** handler do `lbl-import` em `main.js` — o `label` envolvendo o
-`input[type=file]` pode estar capturando o click errado, ou `e.preventDefault()` no listener.
+**Bug do import (resolvido):** o handler do `lbl-import` chamava `input.click()`, que
+borbulhava de volta pro `<label>` e se auto-reentrava, perdendo a ativação do usuário → o
+seletor "não respondia". Correção: listener de `change` ligado uma vez (`bindImport`) e o
+label abre o seletor nativamente; sem `input.click()` manual.
 
 **Por que é P0 agora:** com itens equipados, o estado deixa de ser "remontável de cabeça".
 Sem salvar/carregar, a Sessão 2 começa reconstruindo equipamento, Estus, Almas e Mortes na mão.

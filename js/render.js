@@ -53,27 +53,76 @@ function patchField(el, html) {
 
 /* ---- Helpers de card PC ---- */
 
+/* Padrão visual unificado: valor BASE branco, valor AFETADO dourado,
+   formato "base → atual". Iguais → número único branco. */
+function baseAtualHtml(base, atual) {
+  if (atual === base) return `${base}`;
+  return `${base}<span class="attr-arrow">→</span><span class="attr-new-val">${atual}</span>`;
+}
+
 function renderPcAttrCols(atributos, atributosDelta) {
   return Object.entries(ATTR_LABELS).map(([key, label]) => {
     const base = atributos[key] ?? 0;
     const delta = atributosDelta[key] ?? 0;
-    const valHtml = delta !== 0
-      ? `${base}<span class="attr-arrow">→</span><span class="attr-new-val">${base + delta}</span>`
-      : `${base}`;
     return `<div class="pc-attr-col">
       <span class="pc-vital-label">${label}</span>
-      <span class="pc-attr-val${delta !== 0 ? ' bloodied-changed' : ''}">${valHtml}</span>
+      <span class="pc-attr-val">${baseAtualHtml(base, base + delta)}</span>
     </div>`;
   }).join('');
+}
+
+/* Abreviação para fallback de slot quando a imagem não existe. */
+function abreviar(nome) {
+  const palavras = nome.trim().split(/\s+/);
+  if (palavras.length > 1) return palavras.map(p => p[0]).join('').slice(0, 4).toUpperCase();
+  return nome.slice(0, 4).toUpperCase();
+}
+
+function fmtPerfil(p) {
+  return [
+    p.dano && p.dano !== '—' ? p.dano : '',
+    p.alcance_m != null ? `Alcance ${p.alcance_m}m` : '',
+    p.propriedades?.length ? p.propriedades.join(', ') : ''
+  ].filter(Boolean).join(' · ');
+}
+
+/* Equipment Effects: por item equipado, nome + `especial`; armas
+   (weapon/catalyst) também ganham a linha do `perfil`. Sem especial e
+   sem perfil → item não gera linha. Nada equipado → "—". */
+function renderEquipEfeitos(pc, itens) {
+  const equipados = SLOTS.map(s => pc?.equipamento?.[s.key]).filter(Boolean)
+    .map(id => itens?.[id]).filter(Boolean);
+  const linhas = [];
+  for (const item of equipados) {
+    const ehArma = item.tipo === 'weapon' || item.tipo === 'catalyst';
+    const perfil = (ehArma && item.perfil) ? fmtPerfil(item.perfil) : '';
+    if (!item.especial && !perfil) continue;
+    linhas.push(`<li class="pc-effect-item">
+      <span class="pc-effect-nome">${item.nome}</span>
+      ${perfil ? `<span class="pc-effect-perfil">${perfil}</span>` : ''}
+      ${item.especial ? `<span class="pc-effect-texto">${item.especial}</span>` : ''}
+    </li>`);
+  }
+  if (linhas.length === 0) return `<span class="pc-effects-none">—</span>`;
+  return `<ul class="pc-effects-list pc-effects-list-equip">${linhas.join('')}</ul>`;
 }
 
 function renderSlotsHtml(pc, itens) {
   return SLOTS.map(s => {
     const id = pc?.equipamento?.[s.key];
     const item = id ? itens?.[id] : null;
+    let inner = '';
+    if (item) {
+      const abbr = abreviar(item.nome);
+      inner = item.imagem
+        ? `<img class="pc-slot-img" src="${item.imagem}" alt="${item.nome}"
+             onerror="this.style.display='none';this.nextElementSibling.hidden=false">
+           <span class="pc-slot-abbr" hidden>${abbr}</span>`
+        : `<span class="pc-slot-abbr">${abbr}</span>`;
+    }
     return `
     <div class="pc-slot-wrap">
-      <div class="pc-slot${item ? ' filled' : ''}">${item ? `<span class="pc-slot-item">${item.nome}</span>` : ''}</div>
+      <div class="pc-slot${item ? ' filled' : ''}"${item ? ` title="${item.nome}"` : ''}>${inner}</div>
       <span class="pc-slot-label">${s.label}</span>
     </div>`;
   }).join('');
@@ -90,22 +139,26 @@ function renderSlotsMaster(pc, itens) {
     }
     return `
     <div class="pc-slot-wrap">
-      <select class="pc-slot-select" data-action="set-slot" data-pc="${pc.id}" data-slot="${s.key}">${opts.join('')}</select>
       <span class="pc-slot-label">${s.label}</span>
+      <select class="pc-slot-select" data-action="set-slot" data-pc="${pc.id}" data-slot="${s.key}">${opts.join('')}</select>
     </div>`;
   }).join('');
 }
 
-// Display da AC com flash de equipamento (↑/↓) reaproveitando o ouro do Bloodied.
-function acFlashHtml(ac, dir) {
-  if (!dir) return `${ac}`;
-  return `<span class="ac-flash ac-flash-${dir}">${ac}<span class="attr-arrow ac-dir">${dir === 'up' ? '↑' : '↓'}</span></span>`;
+/* AC: "base → atual" persistente (Item 1) + flash transitório (↑/↓) só no
+   instante do equip/desequip, sobreposto ao valor novo. */
+function acDisplayHtml(base, atual, dir) {
+  const core = baseAtualHtml(base, atual);
+  if (!dir) return core;
+  return `<span class="ac-flash ac-flash-${dir}">${core}<span class="attr-arrow ac-dir">${dir === 'up' ? '↑' : '↓'}</span></span>`;
 }
 
 function renderPortraitHtml(pc) {
-  return pc.imagem_url
-    ? `<img src="${pc.imagem_url}" alt="${pc.nome}">`
-    : `<span class="pc-portrait-placeholder">Imagem</span>`;
+  // Tenta o retrato do PC; mesmo fallback dos slots — onerror revela o placeholder.
+  const src = pc.imagem_url || `img/pcs/${pc.id}.png`;
+  return `<img class="pc-portrait-img" src="${src}" alt="${pc.nome}"
+            onerror="this.style.display='none';this.nextElementSibling.hidden=false">
+          <span class="pc-portrait-placeholder" hidden>Imagem</span>`;
 }
 
 function renderPips(mortes, cls) {
@@ -163,9 +216,7 @@ function renderPcCardMaster(card, pc, state, origens, itens) {
     ? `<span class="position-temp">(+${poolTemp} temp)</span>`
     : '';
 
-  const acDisplay = efeitos.acDelta !== 0
-    ? `${acCalc}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
-    : acFlashHtml(acCalc, acDir);
+  const acDisplay = acDisplayHtml(pc.ac_base ?? 10, acEfetiva, acDir);
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
@@ -184,7 +235,6 @@ function renderPcCardMaster(card, pc, state, origens, itens) {
     ? `<button class="btn-primary" data-action="return-combat" data-pc="${pc.id}">Retornar ao combate</button>`
     : '';
 
-  // TODO: equipment effects — implementar quando lógica de equipamento estiver pronta
   const bloodiedEfeitosHtml = (blooded && efeitos.textos.length > 0)
     ? `<div class="pc-effects-bloodied">
         <div class="pc-effects-subtitle">Bloodied Effects</div>
@@ -244,10 +294,10 @@ function renderPcCardMaster(card, pc, state, origens, itens) {
       <div class="pc-separator">◆</div>
       <div class="pc-slots">${renderSlotsMaster(pc, itens)}</div>
       <div class="pc-effects">
-        <div class="pc-effects-equip">
-          <div class="pc-separator">◆</div>
+        <div class="pc-separator">◆</div>
+        <div class="pc-effects-equip-box">
           <div class="pc-effects-subtitle">Equipment Effects</div>
-          <span class="pc-effects-none">—</span>
+          ${renderEquipEfeitos(pc, itens)}
         </div>
         ${bloodiedEfeitosHtml}
       </div>
@@ -419,10 +469,6 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       ${tracosHtml}
       ${resistenciasHtml}
       ${isBloodiedInimigo && faseAtual ? `<div style="color:var(--brasa);font-size:12px;border-left:2px solid var(--brasa);padding-left:6px">Fase atual: ${faseAtual.regra}</div>` : ''}
-      <div>
-        <label for="nota-${inimigo.id}" style="font-size:11px;color:var(--text-dim)">Nota:</label>
-        <textarea id="nota-${inimigo.id}" data-action="set-nota-inimigo" data-inimigo="${inimigo.id}" rows="2">${inimigo.nota}</textarea>
-      </div>
       ${narrativaBtn}
     </div>
   `;
@@ -495,18 +541,13 @@ function renderPcCardPlayers(card, pc, state, origens, itens) {
     ? `<span class="pc-vital-temp">+${poolTemp}</span>`
     : '';
 
-  const acDisplay = efeitos.acDelta !== 0
-    ? `${acCalc}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
-    : acFlashHtml(acCalc, acDir);
+  const acDisplay = acDisplayHtml(pc.ac_base ?? 10, acEfetiva, acDir);
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
     pc.marca_de_sangue_ativa ? `<span class="badge badge-marca">Marca de Sangue</span>` : '',
     morto ? `<span class="badge badge-morte">Aguardando respawn</span>` : ''
   ].filter(Boolean).join('');
-
-  // TODO: equipment effects — implementar quando lógica de equipamento estiver pronta
-  const equipEfeitosHtml = `<span class="pc-effects-none">—</span>`;
 
   const bloodiedEfeitosHtml = (blooded && efeitos.textos.length > 0)
     ? `<div class="pc-effects-bloodied">
@@ -568,10 +609,10 @@ function renderPcCardPlayers(card, pc, state, origens, itens) {
           <span><span class="icon-bancadas">⚱️</span> Bancadas: ${pc.almas_bancadas}</span>
         </div>
         <div class="pc-effects">
-          <div class="pc-effects-equip">
-            <div class="pc-separator">◆</div>
+          <div class="pc-separator">◆</div>
+          <div class="pc-effects-equip-box">
             <div class="pc-effects-subtitle">Equipment Effects</div>
-            ${equipEfeitosHtml}
+            ${renderEquipEfeitos(pc, itens)}
           </div>
           ${bloodiedEfeitosHtml}
         </div>

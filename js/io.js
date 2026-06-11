@@ -66,23 +66,24 @@ export function exportJSON(state) {
   URL.revokeObjectURL(url);
 }
 
-export function importJSON(onLoad) {
+/* Liga o listener UMA vez ao input. O <label> que envolve o input já abre
+   o seletor nativamente — não chamar input.click() aqui (o click programático
+   borbulhava de volta pro label e se auto-reentrava, e o diálogo "não respondia"). */
+export function bindImport(onLoad) {
   const input = document.getElementById('input-import');
-  input.addEventListener('change', function handler(e) {
-    input.removeEventListener('change', handler);
+  if (!input) return;
+  input.addEventListener('change', (e) => {
     const file = e.target.files[0];
+    e.target.value = '';
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const state = JSON.parse(ev.target.result);
-        onLoad(state);
+        onLoad(JSON.parse(ev.target.result));
       } catch {
         alert('Arquivo JSON inválido.');
       }
     };
     reader.readAsText(file);
-    input.value = '';
-  }, { once: false });
-  input.click();
+  });
 }

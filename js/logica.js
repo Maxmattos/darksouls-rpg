@@ -207,8 +207,7 @@ function addInimigo(state, { bestiarioRef, nome, bestiario }) {
     arma_equipada: base && base.armas_disponiveis ? base.armas_disponiveis[0].nome : null,
     position_atual: base ? base.position_max : 10,
     position_max: base ? base.position_max : 10,
-    fase_atual: temFases ? 1 : null,
-    nota: ''
+    fase_atual: temFases ? 1 : null
   });
   return s;
 }
