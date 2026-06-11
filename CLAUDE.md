@@ -74,6 +74,9 @@ Consultar `imagens/estilo_imagens.md` para estilo global e lock
 visual por personagem. No roteiro, marcar [IMG] onde a imagem entra.
 - Todo prompt de imagem orienta a IA a usar a referência oficial do local
   correspondente em Dark Souls.
+- Organização: imagens gerais/recorrentes (PCs, NPCs-âncora) em `imagens/`;
+  imagens específicas de uma sessão (cenas, momentos) em
+  `sessoes/sessãoXX.../`.
 
 REGRAS DE OUTPUT (para você, agente)
 - Sem "vou implementar…" / "implementei X, Y…". Sem resumo final.

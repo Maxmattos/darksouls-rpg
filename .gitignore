@@ -23,8 +23,12 @@ Battle Maps/
 ideias/
 *.local.md
 
-# Imagens (binários não versionados)
-imagens/*.png
-imagens/*.jpg
-imagens/*.jpeg
-imagens/*.webp
+# Imagens da campanha (binários não versionados)
+imagens/**/*.png
+imagens/**/*.jpg
+imagens/**/*.jpeg
+imagens/**/*.webp
+sessoes/**/*.png
+sessoes/**/*.jpg
+sessoes/**/*.jpeg
+sessoes/**/*.webp
