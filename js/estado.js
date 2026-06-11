@@ -32,7 +32,7 @@ export function defaultState() {
         mortes: 0,
         marca_de_sangue_ativa: false,
         imagem_url: '',
-        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
+        equipamento: { mao_esq: null, mao_dir: null, armor: null, anel_esq: null, anel_dir: null },
         status: 'vivo'
       },
       {
@@ -54,7 +54,7 @@ export function defaultState() {
         mortes: 0,
         marca_de_sangue_ativa: false,
         imagem_url: '',
-        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
+        equipamento: { mao_esq: null, mao_dir: null, armor: null, anel_esq: null, anel_dir: null },
         status: 'vivo'
       },
       {
@@ -76,7 +76,7 @@ export function defaultState() {
         mortes: 0,
         marca_de_sangue_ativa: false,
         imagem_url: '',
-        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
+        equipamento: { mao_esq: null, mao_dir: null, armor: null, anel_esq: null, anel_dir: null },
         status: 'vivo'
       },
       {
@@ -98,7 +98,7 @@ export function defaultState() {
         mortes: 0,
         marca_de_sangue_ativa: false,
         imagem_url: '',
-        equipamento: { sword: null, shield: null, armor: null, ring1: null, ring2: null },
+        equipamento: { mao_esq: null, mao_dir: null, armor: null, anel_esq: null, anel_dir: null },
         status: 'vivo'
       }
     ],
@@ -110,10 +110,23 @@ export function defaultState() {
   };
 }
 
+function normalizeEquipamento(eq) {
+  if (!eq) return { mao_esq: null, mao_dir: null, armor: null, anel_esq: null, anel_dir: null };
+  if ('sword' in eq || 'shield' in eq || 'ring1' in eq) {
+    return { mao_esq: eq.sword ?? null, mao_dir: eq.shield ?? null, armor: eq.armor ?? null, anel_esq: eq.ring1 ?? null, anel_dir: eq.ring2 ?? null };
+  }
+  return { mao_esq: eq.mao_esq ?? null, mao_dir: eq.mao_dir ?? null, armor: eq.armor ?? null, anel_esq: eq.anel_esq ?? null, anel_dir: eq.anel_dir ?? null };
+}
+
+function normalizeState(s) {
+  if (s?.pcs) s.pcs = s.pcs.map(pc => ({ ...pc, equipamento: normalizeEquipamento(pc.equipamento) }));
+  return s;
+}
+
 export function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return normalizeState(JSON.parse(raw));
   } catch { /* corrupted */ }
   return null;
 }

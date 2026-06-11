@@ -5,6 +5,64 @@ Atualizar conforme o projeto avança.
 
 ---
 
+## Estado atual / ponto de retomada
+
+> **ÚLTIMA LEVA (concluída):** saves computados no card de inimigo (6 atributos, proficientes
+> em dourado); slots ativos do PC migrados para `mao_esq / mao_dir / armor / anel_esq /
+> anel_dir`; normalização de estado migrando localStorage antigo; fix do `ATTR_ORDER`
+> duplicado. Validado: tela volta a renderizar; saves aprovados.
+>
+> **VALIDAÇÃO VISUAL PENDENTE (fazer antes da próxima leva):** alinhamento vertical dos
+> saves (atributo sobre save na mesma coluna) e labels dos slots (MÃO ESQ/DIR · ANEL
+> ESQ/DIR) nas duas telas — não conferido porque a tela havia quebrado logo após.
+>
+> **PRÓXIMA LEVA:** motor de efeitos sobre `itens.json` (Marin como cobaia). Validação ponta
+> a ponta: equipar Pyromancer Robes → AC 11→13 (amarelo+seta); + Caduceus Shield → 14;
+> desequipar escudo → volta a 13.
+>
+> **Arquivo pronto, fora do commit até a próxima leva:** `itens.json` (4 itens do Marin
+> modelados com `set`/`add`, perfil de arma e special).
+
+---
+
+## Prioridades — repriorização pós Sessão 1 (Undead Asylum)
+
+Retro guiada pelo que atritou na mesa, não pelo backlog teórico. Ordem para a Sessão 2:
+
+**P0 — Sessão 2**
+
+1. **Sistema de itens (épica única)** — banco de itens + equipar nos slots + motor de
+   efeitos recalculando atributos (com destaque amarelo/seta) + imagens. Começar pelo Marin.
+2. **Persistência de sessão (salvar/carregar)** — pré-requisito do item 1: os itens
+   equipados precisam sobreviver entre sessões. Absorve o antigo bug "Carregar JSON".
+3. **Card de inimigo: atributos + saves visíveis + hierarquia** — o dado JÁ EXISTE no
+   `bestiario.json`. É correção de render, não de schema. Necessário porque o combate
+   com o Asylum vem na Sessão 2.
+4. **Espaçamento dos cards de PC** — Position/Estus/Almas/Mortes estão coladas.
+5. **Responsividade da vista jogadores** — ocupar % alvo de qualquer TV.
+
+**Mudou de forma / adiado**
+
+- Bug "Carregar JSON não responde" → absorvido pela persistência de sessão (P0 item 2).
+- Campo de **Nota do inimigo** → **consertar** o bug de foco (mantém o campo). Em uso na
+  Sessão 1 "deu mais problema que ajuda"; mesmo assim a anotação rápida é útil, então
+  arruma em vez de remover. Causa: a seção re-renderiza e recria o textarea focado.
+- **Rastreio de iniciativa** → posterior. Volta junto com o tema "notas/turno".
+- **Level up mid-sessão** → mantido no backlog; reavaliar quando o grupo bancar almas
+  com Serelyn (fogueira de Majula).
+
+**P2 — sem atrito na mesa, parado até dar sinal**
+
+- Spell tracking por caster (confirmar antes se Marin conjurou na Sessão 1).
+- Bestiário — UI rica de seleção (o card atual já entrega; só investir quando falhar).
+- Fogueira como entidade.
+- Acesso de jogadores por dispositivo próprio (**único gatilho real para um backend**).
+
+**Decisão de stack:** permanecer em **JS + JSON**. Sem banco de dados, sem migração de
+linguagem. Justificativa na seção "Decisão: stack" abaixo.
+
+---
+
 ## v1 — Sessão 1 (escopo definido em `spec_painel.md`)
 
 ### Especificado
@@ -26,135 +84,287 @@ Atualizar conforme o projeto avança.
 - [x] Atributos base dos PCs no schema
 - [x] Destaque visual de atributos afetados por Bloodied (15 → 17)
 
-### Implementado
+### Validado em produção (Sessão 1)
 
-*(preencher conforme `painel_mestre.html` for construído)*
-
-- [ ] ...
-
----
-
-## Backlog
-
-Itens fora do escopo da sessão 1. Priorizar antes da sessão em que forem necessários.
+- [x] Setup notebook (mestre) + TV via HDMI (jogadores) — sem falha técnica
+- [x] Card de inimigo (Asylum Demon): fases, gatilhos de Position, ações, navegação de fase
+- [x] Cards de PC: loop de Souls (Position, Estus, Almas coletadas/bancadas, Mortes 0/3)
 
 ---
 
-### Bug: Carregar JSON não responde
+## Decisão: stack (JS + JSON, sem DB)
 
-**Status:** identificado durante testes da v1; deixado de fora da sessão 1 porque export funciona (snapshot final basta).
+Mantida deliberadamente após a Sessão 1.
 
-**Hipótese:** handler do botão pode estar quebrado pela mudança de label/input ou pelo `e.preventDefault()` no listener.
-
-**Investigar:** `main.js` — listener do `lbl-import`, verificar se o `input[type=file]` está sendo clicado corretamente. Pode ser que o `label` envolva o input e o click esteja sendo capturado errado.
-
-**Prioridade:** antes da sessão 2 (para poder restaurar estado entre sessões via JSON).
-
----
-
-### Efeitos de equipamento aplicados no card
-
-**Status:** schema tem campo `equipamento: { sword, shield, armor, ring1, ring2 }` (todos null), UI já exibe os 5 slots vazios. Falta:
-
-1. Criar `equipamento.json` na raiz — catálogo de itens com nome, tipo de slot, e efeitos estruturados (ex: `+2 AC`, `+1 DEX`, `"vantagem em saves de Força"`).
-2. Modal de seleção de item por slot (similar ao "+ Adicionar do bestiário", filtrado por tipo de slot).
-3. Lógica em `logica.js`: AC efetiva = `ac_base + ac_de_equipamento + ac_de_bloodied`. Atributos modificados por equipamento somam ao base antes do Bloodied.
-4. Renderizar lista de efeitos ativos no bloco "EQUIPMENT EFFECTS" do card, lendo `pc.equipamento` + `equipamento.json`.
-
-**Nota:** a entrada "Slots de equipamento do PC" mais abaixo cobre o backlog visual (imagens de item). Esta entrada cobre exclusivamente a lógica de efeito.
-
-**Prioridade:** quando os PCs adquirirem o primeiro item com efeito mecânico significativo (provavelmente sessão 2–3).
+- **Banco de itens = dado de referência estático**, igual ao `bestiario.json`. Carrega no
+  boot via `fetch`, sem escrita em runtime. JSON é a ferramenta certa.
+- **Salvar sessão = serializar o estado**: `JSON.stringify(estado)` → download; `JSON.parse`
+  no import; localStorage para persistência local. Não exige banco.
+- **Backend só se justifica para "acesso por dispositivo próprio"** (celular dos jogadores),
+  porque BroadcastChannel não cruza máquinas. Esse é o gatilho para reconsiderar — não o
+  banco de itens nem o save de sessão.
 
 ---
 
-### Level up mid-sessão
+## P0 — Sistema de itens (épica)
 
-**Contexto:** level up é decisão do jogador, não do mestre — acontece quando o PC banca as almas na fogueira. O painel pode facilitar sem se tornar uma trava.
+Unifica três entradas que antes eram separadas (efeitos de equipamento, slots de
+equipamento, banco de itens). Tudo depende de um item modelado, então é uma épica só.
+**Começar por um único PC (Marin) como caso de teste antes de cadastrar todos.**
 
-**Comportamento desejado:**
-- Botão "Subiu de nível" por PC abre um mini-formulário com:
-  - Campo `nivel` (incrementado automaticamente)
-  - Campo `con_mod` (editável — o jogador pode ter aumentado CON neste nível)
-- Ao confirmar: `base_position += con_mod`; `estus_max` recalculado pela tabela; `position_atual` ajustado proporcionalmente ou mantido (a decidir)
-- O cálculo deve ser transparente e reversível — se o mestre errar, precisa corrigir sem refazer tudo
+### 1. Banco de itens — `itens.json` na raiz
 
-**Complexidade:** `con_mod` pode mudar no level up (aumento de atributo). O painel precisa do valor antigo e do novo para calcular corretamente. Detalhar na spec quando for priorizar.
+Catálogo estático. **Modelar os itens reais do Marin revelou que "+N aditivo" não basta** —
+os efeitos se dividem em três naturezas, e só a primeira alimenta o recálculo amarelo/seta:
 
-**Prioridade:** necessário antes da sessão 2 (o grupo sobe para nível 2 ao final da sessão 1 — ver roteiro em `/sessoes/sessão01_01_06_2026/`).
+1. **Efeitos de stat (alimentam o motor):** com `operacao` `add` (soma, ex.: escudo +1 AC,
+   anel +1) ou `set` (define a base, ex.: armadura "AC = 12 + mod DES").
+2. **Perfil de arma (exibido, não recalcula):** dano, alcance, propriedades. É info de
+   referência, não modificador de stat.
+3. **Especial (exibido como texto, gasta Position):** ex.: grito de guerra, +1d4 de fogo,
+   rerolar save. Não recalcula stat; aparece como habilidade no card.
+
+Schema:
+
+```json
+{
+  "caduceus_round_shield": {
+    "nome": "Caduceus Round Shield",
+    "slot": "mao",
+    "tipo": "shield",
+    "forca_min": 10,
+    "imagem": "img/itens/caduceus_round_shield.png",
+    "descricao": "Pintado com serpentes gêmeas, símbolo dos que habitavam o pântano.",
+    "efeitos": [
+      { "alvo": "ac", "operacao": "add", "valor": 1, "tipo": "sempre" }
+    ],
+    "especial": "1×/descanso longo, gaste 1 Position para rerolar um save de DES falho."
+  },
+  "pyromancer_robes": {
+    "nome": "Pyromancer Robes",
+    "slot": "armor",
+    "tipo": "armor",
+    "forca_min": null,
+    "efeitos": [
+      { "alvo": "ac", "operacao": "set", "base": 12, "usa_mod": "des", "tipo": "sempre" }
+    ],
+    "especial": "Reduz qualquer dano de fogo recebido em 5 (mínimo 1)."
+  }
+}
+```
+
+- `slot`: `mao` (arma OU escudo) | `armor` | `ring`
+- `tipo`: `weapon` | `shield` | `armor` | `ring` | `catalyst` (catalisador = Flame/Staff/Talisman)
+- `forca_min`: requisito de Força (`null` = nenhum). Regra do livro: para **armadura** a
+  Força precisa atingir o mínimo antes de qualquer bônus dela valer.
+- `efeitos[].operacao`: `add` (soma) ou `set` (define base; usa `base` + opcional `usa_mod`)
+- `efeitos[].tipo`: `sempre` ou `condicional`
+- `perfil` (armas, opcional): `{ dano, alcance_m, propriedades }`
+- `especial`: texto da habilidade que gasta Position (exibido, não calculado)
+
+### 2. Equipar — slots ativos (modelo do livro)
+
+O livro separa **carregar** (15 slots de inventário) de **empunhar/vestir** (5 slots ativos).
+O painel modela só os ativos:
+
+- **1 armadura**
+- **1 anel mão esquerda** + **1 anel mão direita**
+- **1 mão esquerda** (arma OU escudo) + **1 mão direita** (arma OU escudo)
+
+> **DECISÃO ABERTA (bloqueia o cadastro do Marin):** os slots atuais são `SWORD / SHIELD /
+> ARMOR / RING1 / RING2`. Isso não acomoda o Marin — a Pyromancer's Flame é um **catalisador**,
+> nem espada nem escudo, e não tem onde morar. Duas opções:
+> - **(A) Manter SWORD/SHIELD** — mais simples, mas sem lugar pro catalisador e sem dual-wield.
+> - **(B) Trocar para MÃO ESQ / MÃO DIR** (cada uma arma-ou-escudo-ou-catalisador) — fiel ao
+>   livro, resolve o Marin, permite empunhar 2 quaisquer de {club, flame, escudo}.
+> Recomendação: **(B)**. Não bloqueia o teste do recálculo de AC (armadura + escudo já
+> funcionam em qualquer modelo), mas é pré-requisito pra representar a mão do Marin.
+
+`pc.equipamento` referenciando o `id` do item por slot. Equipar = modal por slot, filtrado
+por `tipo` compatível. **Desequipar = um clique** (limpa o slot e recalcula na hora) — é o
+mecanismo que substitui o `toggle` para estados transitórios de mesa ("largou o escudo").
+
+**Regra de mesa (não automatizar agora):** empunhar exige mão livre — 2 mãos só. Trocar o
+que está na mão em combate custa a **ação "Usar um Objeto"** (sacar 1 item é grátis 1×/turno;
+guardar+sacar = 2ª interação = gasta a ação). O painel reflete o que está equipado; a
+legalidade fica a critério do mestre.
+
+### 3. Motor de efeitos — recálculo unificado
+
+Uma única função resolve todos os atributos efetivos. Bloodied passa a ser **só mais uma
+fonte de efeito** no mesmo somatório (item + bloodied + futuro buff de magia). Os efeitos
+`set` definem a base; os `add` somam por cima:
+
+```
+// caso da AC:
+base_ac = armaduraEquipada
+            ? armadura.base + (armadura.usa_mod ? mod[armadura.usa_mod] : 0)   // efeito "set"
+            : 10 + mod_des                                                     // sem armadura
+ac_efetiva = base_ac + Σ( efeitos "add" ativos sobre ac )   // escudo +1, anéis, bloodied...
+```
+
+Ex. Marin: sem nada AC 11 (10 + DES +1). Com Pyromancer Robes (set 12 + DES) → 13. Com
+Caduceus Shield por cima (add +1) → 14. Desequipa o escudo → volta a 13.
+
+Tipos de gatilho que determinam se um efeito está **ativo**:
+
+- `sempre` — ativo enquanto o item está equipado (ex.: escudo +2 AC; anel +1 AC).
+- `condicional` — automático por estado (ex.: bônus quando Bloodied; Position ≤ limiar).
+
+**Sem tipo `toggle`.** Estados transitórios de mesa ("largou o escudo", "guardou a arma")
+são resolvidos desequipando o item — o recálculo é automático — e reequipando depois.
+Isso só funciona se o equipar/desequipar for de **um clique** (ver item 2).
+
+### 4. Render — reaproveitar o destaque que já existe
+
+O destaque amarelo + seta de mudança de atributo **já está implementado** (usado hoje no
+Bloodied: 15 → 17). O motor de efeitos alimenta esse MESMO caminho de render. Quando
+`efetivo != base`, mostra o valor efetivo em amarelo com seta (↑/↓) e o base de referência.
+Vale tanto na vista mestre quanto na vista jogadores.
+
+### 5. EQUIPMENT EFFECTS no card
+
+Lista os efeitos ativos lendo `pc.equipamento` + `itens.json`. Hoje renderiza "—".
+Separador visual entre efeitos de item e efeitos de Bloodied.
+
+### 6. Imagens dos itens
+
+Após a lógica funcionar. Imagem nos 5 slots (placeholder quando vazio) e imagem +
+descrição na vista jogadores (preenche o espaço hoje vazio da TV).
+
+**Caso de teste:** Marin (Pyromancer · Caster). Validar schema e recálculo com 1 PC antes
+de cadastrar os outros três.
 
 ---
 
-### Bestiário — UI rica de seleção
+## P0 — Persistência de sessão (salvar/carregar)
 
-**Contexto:** v1 carrega `bestiario.json` e pré-popula inimigos da sessão 1 no estado inicial. Adicionar novos inimigos durante a sessão funciona via JSON manual ou "+ Adicionar do bestiário" simples.
+**Status:** o antigo bug "Carregar JSON não responde" entra aqui. Export já funciona;
+o import é que está quebrado.
 
-**Comportamento desejado:**
-- Modal de busca com filtros (CR, tipo, tags como "undead", "demon", "boss")
-- Preview do stat block antes de instanciar
-- Sugestões de encontros balanceados por CR do grupo
-- Editor in-place do bestiário (sem editar JSON manualmente)
+**Hipótese do bug:** handler do `lbl-import` em `main.js` — o `label` envolvendo o
+`input[type=file]` pode estar capturando o click errado, ou `e.preventDefault()` no listener.
 
-**Prioridade:** quando o bestiário tiver 10+ entradas.
+**Por que é P0 agora:** com itens equipados, o estado deixa de ser "remontável de cabeça".
+Sem salvar/carregar, a Sessão 2 começa reconstruindo equipamento, Estus, Almas e Mortes na mão.
 
----
-
-### Spell tracking por PC caster
-
-**Contexto:** Marin (Pyromancer) tem attunement slots e casts por spell. Por decisão da v1, spell tracking fica fora do painel. Razões:
-(1) o jogador caster já controla seus próprios recursos na ficha de personagem; o painel não deve duplicar esse controle;
-(2) preserva tensão narrativa — os outros PCs (na vista TV) não descobrem por antecipação que o caster tem uma spell poderosa disponível; a revelação acontece pela narração do próprio jogador na hora do uso.
-
-**Comportamento desejado (a refinar):**
-- Seção colapsável no card do PC, visível somente na vista mestre
-- Lista de spells equipadas com `nome`, `casts_atual`, `casts_max`
-- Botão por spell: "Usar cast" (`casts_atual--`) e "Recarregar" (reset ao Long Rest)
-- Spells só recarregam em Long Rest em fogueira (ver Mecanicas.md §3 e §6)
-
-**Dependência:** ficha final de Marin com spell list e attunement slots da classe Pyromancer.
+**Comportamento:** salvar = snapshot do `estado` em JSON (download + localStorage);
+carregar = restaurar de arquivo. Garantir que itens equipados e contadores de morte
+voltem íntegros.
 
 ---
 
-### Fogueira como entidade
+## P0 — Card de inimigo: atributos/saves + hierarquia
 
-**Contexto:** Long Rest só é possível em fogueira (RAW — ver Mecanicas.md §3). O painel poderia registrar qual fogueira está ativa e disparar o reset de Estus, casts e inimigos comuns.
+**Achado-chave:** o dado JÁ EXISTE no `bestiario.json`. Toda entrada tem:
 
-**Comportamento desejado (a refinar):**
-- Campo "Fogueira ativa" (nome livre)
-- Botão "Descanso Longo": recarrega Estus de todos, recarrega casts, reseta inimigos comuns (chefes não)
-- Botão "Descanso Curto": restaura metade da Base Position de cada PC
+- `atributos` como **modificadores prontos** (ex.: Asylum Demon `str:3, dex:2, con:2, int:-1, wis:0, cha:0` — já é o +3, +2 para somar no d20)
+- `saves` já com o bônus (ex.: `str:5, con:4, wis:2`)
+
+O `hollow_soldier` também tem ambos. O card só não os desenha — por isso o teste de
+"tirar a arma do hollow" travou (era preciso o modificador de FOR/atletismo na mão).
+**É correção de render, não de schema.**
+
+**Reorganizar a hierarquia (topo = consulta constante → base = raro):**
+
+1. Header — nome, HP atual/máx, fase + navegação (já existe)
+2. **Atributos + saves + AC/Vel/Iniciativa** — bloco destacado, escaneável *(novo render)*
+3. Fases (com seus gatilhos de golpe)
+4. Ações (dano, efeito, DC)
+5. Traços — menores, mais abaixo
+6. Resistências / imunidades de dano / imunidades de condição — menor de tudo, na base
+
+**Forma:** "mais quadrado" = stat block compacto, não a tira de texto corrido larga.
+Atributos e info de combate fáceis de ler; o raro afunda.
+
+**Refinação (validada na mesa):** a linha de atributos e a de saves respondem perguntas
+diferentes e NÃO são redundantes — atributos = testes e disputas (ex.: tirar a arma do
+hollow = teste de Força); saves = testes de resistência. A diferença de valor (FOR mod +3
+vs. FOR save +5 no Asylum) é o **bônus de proficiência** somado nos saves em que a criatura
+é proficiente. Exibir os **6 saves computados** (os não-proficientes = igual ao modificador),
+marcando visualmente os proficientes, para o mestre ler sem calcular "se não tem é +0".
 
 ---
 
-### Acesso de jogadores por dispositivo próprio
+## P0 — Espaçamento dos cards de PC
 
-**Contexto:** hoje a vista jogadores roda na TV via HDMI do notebook do mestre. Futuro: cada jogador acessa no celular.
-
-**Bloqueio:** BroadcastChannel só funciona na mesma máquina/browser. Precisaria de servidor (WebSocket, servidor local, ou solução P2P) para comunicação cross-device.
+Position, Estus, Almas coletadas, Almas bancadas e Mortes estão visualmente coladas.
+Passada de CSS (respiro vertical entre linhas). Trivial; vai junto com outros ajustes de card.
 
 ---
+
+## P0 — Responsividade da vista jogadores
+
+**Contexto:** a vista mestre roda SEMPRE no notebook (tamanho conhecido). A vista
+jogadores roda em TV de tamanho variável (~60–70"), e hoje ocupa só o canto superior
+esquerdo — ~70% da tela fica preta.
+
+**Decisão:** manter tudo visível para todos (a sugestão de "painel no canto + cena de
+fundo" foi descartada por ora — quando os itens entrarem, todos precisam ver tudo).
+
+**Comportamento:** a vista jogadores deve preencher um % alvo de qualquer viewport.
+Abordagens (decidir na implementação): unidades relativas (`vw`/`vh`/`clamp`) e/ou
+`scale-to-fit` por JS medindo o viewport. Vista mestre fica com layout fixo de notebook.
+
+**Sequência:** atacar DEPOIS de itens + retrato existirem — assim sabe-se *o que* escalar
+(escalar caixas vazias não resolve nada).
+
+---
+
+## Backlog adiado / P2
 
 ### Rastreamento de iniciativa / ordem de turno
 
-**Contexto:** hoje o painel é tracker passivo de Position. Ordem de combate (Fast/Slow) é gerenciada verbalmente na mesa.
+Hoje gerenciado verbalmente; na Sessão 1 o campo de Nota do inimigo foi improvisado para
+anotar a ordem (evidência de necessidade). O campo de Nota será consertado (não removido);
+o rastreio de iniciativa próprio vem depois.
 
-**Comportamento desejado (a refinar):**
-- Input de iniciativa por criatura (DC + resultado da rolagem)
-- Exibição da ordem: Fast (acima da DC) → Slow (abaixo)
-- Botão "Próximo turno" avança para a próxima criatura na lista
+**Comportamento (a refinar):** input de iniciativa por criatura (DC + rolagem); ordem
+Fast (acima da DC) → Slow (abaixo); botão "Próximo turno".
 
----
+### Level up mid-sessão
 
-### Slots de equipamento do PC
+**Contexto:** level up é decisão do jogador (banca almas na fogueira). Reavaliar quando o
+grupo bancar com Serelyn em Majula.
 
-**Contexto:** painel hoje mostra atributos e Bloodied effects. Faltam os itens equipados (Dark Souls clássico): espada / escudo / armadura / anel 1 / anel 2.
+**Comportamento (a refinar):** botão "Subiu de nível" por PC → mini-form com `nivel`
+(auto) e `con_mod` (editável). Ao confirmar: `base_position += con_mod`; `estus_max`
+recalculado; `position_atual` ajustado. Cálculo transparente e reversível.
 
-**Comportamento desejado:**
-- 5 slots visuais no card de PC (vista mestre E jogadores).
-- Quadrados/retângulos com imagem do item ou placeholder.
-- Cada item tem efeito ativo (texto curto) exibido abaixo dos atributos, antes dos efeitos de Bloodied.
-- Separador visual entre "efeitos de item" e "efeitos de Bloodied".
-- Edição via modal do mestre (escolher do `equipamento.json`).
+### Spell tracking por PC caster
 
-**Dependência:** criar `equipamento.json` (catálogo de itens com imagem, tipo, efeito).
+**Pendência:** confirmar se Marin conjurou na Sessão 1 antes de priorizar. Fora do painel
+na v1 por decisão: (1) o caster já controla os recursos na ficha; (2) preserva tensão —
+os outros PCs (vista TV) não antecipam que há spell poderosa disponível.
 
-**Prioridade:** quando os PCs adquirirem itens com efeito ativo significativo (provavelmente após sessão 2–3).
+**Comportamento (a refinar):** seção colapsável no card, só na vista mestre; spells com
+`nome`, `casts_atual`, `casts_max`; "Usar cast" / "Recarregar" (reset no Long Rest em
+fogueira — Mecanicas.md §3 e §6). **Dependência:** ficha final de Marin.
+
+### Bestiário — UI rica de seleção
+
+O card atual já entrega valor (validado na Sessão 1). Investir só quando falhar.
+Comportamento futuro: modal com filtros (CR/tipo/tags), preview do stat block, editor
+in-place. Priorizar quando o bestiário tiver 10+ entradas.
+
+### Fogueira como entidade
+
+Long Rest só em fogueira (Mecanicas.md §3). Futuro: campo "Fogueira ativa"; botão
+"Descanso Longo" (recarrega Estus, casts, reseta inimigos comuns — chefes não);
+"Descanso Curto" (metade da Base Position).
+
+### Drop de itens por inimigo (ideia — Caio, prep Sessão 2)
+
+Combinado com os jogadores: monstros terão drop rate de itens. Quando o mestre preparar
+isso, precisa registrar em algum lugar qual item cai e o que ele faz.
+
+**Questão em aberto:** isso é feature do painel (ex.: campo `drops` no `bestiario.json`,
+exibido só pro mestre / revelado ao matar) ou pertence só ao planejamento da sessão (doc)?
+Há N formas de automatizar — **não é foco agora**. Registrado para não se perder.
+Dependência natural: o sistema de itens (`itens.json`) já existir, pra referenciar o item por `id`.
+
+### Acesso de jogadores por dispositivo próprio
+
+Hoje a vista jogadores roda na TV via HDMI. Futuro: cada jogador no celular.
+**Bloqueio:** BroadcastChannel só funciona na mesma máquina/browser — exigiria servidor
+(WebSocket / local / P2P). **Este é o único item que justificaria sair de JS + JSON.**

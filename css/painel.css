@@ -592,6 +592,9 @@ textarea { resize: vertical; min-height: 48px; }
   min-width: 0;
 }
 
+#view-master .stat-row,
+#view-master .mortes-row { margin-bottom: 5px; }
+
 #view-master .pc-nome { font-size: 15px; letter-spacing: 0.03em; }
 #view-master .pc-subtitulo { font-size: 11px; margin-bottom: 2px; }
 #view-master .pc-separator { margin: 5px 0; }
@@ -687,15 +690,88 @@ textarea { resize: vertical; min-height: 48px; }
 
 .card-inimigo-body.collapsed { display: none; }
 
-.inimigo-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 4px 12px;
+.inimigo-combat-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
   font-size: 12px;
 }
 
-.inimigo-stat { display: flex; gap: 6px; }
-.inimigo-stat-label { color: var(--text-dim); }
+.inimigo-stat { display: flex; gap: 4px; align-items: baseline; }
+.inimigo-stat-label { color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
+
+/* Stat block compacto: atributos + saves */
+.inimigo-statblock {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--borda);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.inimigo-attrs-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.inimigo-attr-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+  border-right: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+.inimigo-attr-col:last-child { border-right: none; }
+
+.inimigo-attr-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+}
+
+.inimigo-attr-val {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.inimigo-saves-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--borda);
+  align-items: center;
+}
+
+.inimigo-saves-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.inimigo-save-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.inimigo-save-item.proficiente { color: var(--dourado); font-weight: bold; }
+
+/* Resistências / imunidades — rodapé do card */
+.inimigo-resistencias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  padding-top: 4px;
+  border-top: 1px solid var(--borda);
+  color: var(--text-dim);
+}
 
 .fases-list { font-size: 12px; }
 .fase-item { padding: 4px 6px; border-radius: 3px; margin: 2px 0; }

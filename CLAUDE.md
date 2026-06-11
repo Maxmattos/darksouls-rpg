@@ -48,6 +48,27 @@ ESTRUTURA DE PASTAS
 - DS RPG - EN.pdf        livro original (não versionado — copyright)
 - DS RPG - PT.pdf        tradução não-oficial (só pra conferir termos)
 
+CONVENÇÃO DE SESSÕES (a partir da Sessão 2): arquivos de sessão em
+`sessoes/sessao_0X.md` — plano, sem tema/duração/data no nome. Sessões
+podem transbordar entre si (a Sessão 1 não terminou), então não fixe
+fronteira de conteúdo no nome. Sessão 1 fica onde está.
+
+RITMO E FORMATO DE SESSÃO
+- Calibrar cada sessão real para até ~3h. A Sessão 1 rodou ~2h com muita
+  conversa/RP. Se os jogadores progredirem rápido, plantar obstáculo/NPC
+  para esticar até ~3h sem atropelar.
+- Roteiro objetivo, curto, claro. Gatilho rápido > leitura longa (parar
+  pra ler quebra a imersão). Fala longa só onde o tom/mistério exige
+  (NPC-âncora). O roteiro conduz a ORDEM da sessão; stat blocks no painel.
+- Cues [IMG] e 🎵 inline, no ponto da cena.
+
+IMAGENS: os jogadores respondem muito a imagens. Prompts são gerados nas
+conversas de prep (com contexto de cena) e formatados para o ChatGPT.
+Consultar `imagens/estilo_imagens.md` (a criar) para estilo global e lock
+visual por personagem. No roteiro, marcar [IMG] onde a imagem entra.
+- Todo prompt de imagem orienta a IA a usar a referência oficial do local
+  correspondente em Dark Souls.
+
 REGRAS DE OUTPUT (para você, agente)
 - Sem "vou implementar…" / "implementei X, Y…". Sem resumo final.
 - Mudança pequena = só o trecho. Não recolar arquivo inteiro.
@@ -68,4 +89,8 @@ ESTADO ATUAL
 - Repo público: github.com/Maxmattos/darksouls-rpg (branch main).
 - Próximo: implementar painel_mestre.html a partir de spec_painel.md
   (branch feat/painel-mestre).
-- Sessão 1 (Undead Asylum) roteirizada em /sessoes/sessao01_01_06_2026/.
+- Sessão 1 (01/06/2026, ~2h): completados Ato 0–2; parou na fogueira antes
+  do boss. Grupo ainda nível 1.
+- Sessão 2 = Ato 3 (Asylum Demon) + Ato 4 (penhasco/Nish → Majula jogável:
+  Serelyn, mecânica de fogueira, nível 2, Rendal, Lenigrast). Roteiro em
+  `sessoes/sessao_02.md`.

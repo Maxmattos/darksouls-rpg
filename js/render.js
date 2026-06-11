@@ -3,11 +3,11 @@ import { isBloodied, bloodiedEfeitos } from './logica.js';
 const ATTR_LABELS = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
 const SLOTS = [
-  { key: 'sword',  label: 'SWORD'  },
-  { key: 'shield', label: 'SHIELD' },
-  { key: 'armor',  label: 'ARMOR'  },
-  { key: 'ring1',  label: 'RING 1' },
-  { key: 'ring2',  label: 'RING 2' },
+  { key: 'mao_esq',  label: 'MÃO ESQ'  },
+  { key: 'mao_dir',  label: 'MÃO DIR'  },
+  { key: 'armor',    label: 'ARMADURA' },
+  { key: 'anel_esq', label: 'ANEL ESQ' },
+  { key: 'anel_dir', label: 'ANEL DIR' },
 ];
 
 /* ---- Utilitários de DOM ---- */
@@ -251,22 +251,45 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
 
   const isCollapsed = card._collapsed === true && !expanded;
 
-  const statsHtml = base ? `
-    <div class="inimigo-stats-grid">
-      <div class="inimigo-stat"><span class="inimigo-stat-label">AC:</span>${base.ac}</div>
-      <div class="inimigo-stat"><span class="inimigo-stat-label">Vel:</span>${base.velocidade_m}m</div>
-      ${base.iniciativa_dc ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Iniciativa DC:</span>${base.iniciativa_dc}</div>` : ''}
-      ${base.iniciativa ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Iniciativa:</span>${base.iniciativa}</div>` : ''}
-      <div class="inimigo-stat"><span class="inimigo-stat-label">Almas:</span>${base.almas}</div>
-      ${base.imunidades_dano?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Imune:</span>${base.imunidades_dano.join(', ')}</div>` : ''}
-      ${base.resistencias_dano?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Resist:</span>${base.resistencias_dano.join(', ')}</div>` : ''}
-      ${base.imunidades_condicao?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Imune cond:</span>${base.imunidades_condicao.join(', ')}</div>` : ''}
+  const fmtMod = v => v >= 0 ? `+${v}` : `${v}`;
+
+  // Bloco superior: AC / Vel / Iniciativa / Almas (consulta constante no turno)
+  const combatInfoHtml = base ? `
+    <div class="inimigo-combat-stats">
+      <div class="inimigo-stat"><span class="inimigo-stat-label">AC</span>${base.ac}</div>
+      <div class="inimigo-stat"><span class="inimigo-stat-label">Vel</span>${base.velocidade_m}m</div>
+      ${base.iniciativa_dc ? `<div class="inimigo-stat"><span class="inimigo-stat-label">DC ini</span>${base.iniciativa_dc}</div>` : ''}
+      ${base.iniciativa ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Ini</span>${base.iniciativa}</div>` : ''}
+      <div class="inimigo-stat"><span class="inimigo-stat-label">Almas</span>${base.almas}</div>
     </div>` : `<p style="color:var(--brasa);font-size:12px">⚠ Ref "${inimigo.bestiario_ref}" não encontrada no bestiário</p>`;
 
-  const tracosHtml = base?.tracos?.length ? `
-    <div>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">TRAÇOS</div>
-      ${base.tracos.map(t => `<div class="acao-item"><span class="acao-nome">${t.nome}</span> — ${t.efeito}</div>`).join('')}
+  // Stat block compacto: atributos + saves
+  const atributosSavesHtml = base?.atributos ? (() => {
+    const ATTR_ORDER = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+    const attrsHtml = ATTR_ORDER.map(k => `
+      <div class="inimigo-attr-col">
+        <span class="inimigo-attr-label">${ATTR_LABELS[k]}</span>
+        <span class="inimigo-attr-val">${fmtMod(base.atributos[k] ?? 0)}</span>
+      </div>`).join('');
+    const savesHtml = ATTR_ORDER.map(k => {
+      const prof = base.saves && k in base.saves;
+      const val  = prof ? base.saves[k] : (base.atributos[k] ?? 0);
+      return `<span class="inimigo-save-item${prof ? ' proficiente' : ''}"><span class="inimigo-attr-label">${ATTR_LABELS[k]}</span> ${fmtMod(val)}</span>`;
+    }).join('');
+    return `
+      <div class="inimigo-statblock">
+        <div class="inimigo-attrs-row">${attrsHtml}</div>
+        ${savesHtml ? `<div class="inimigo-saves-row"><span class="inimigo-saves-label">Saves:</span>${savesHtml}</div>` : ''}
+      </div>`;
+  })() : '';
+
+  const fasesListHtml = base?.fases?.length ? `
+    <div class="fases-list">
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">FASES</div>
+      ${base.fases.map(f => `
+        <div class="fase-item${f.id === inimigo.fase_atual ? ' ativa' : ''}">
+          <strong>${f.nome}</strong> (${f.gatilho}) — ${f.regra}
+        </div>`).join('')}
     </div>` : '';
 
   const armaEqAtual = base?.armas_disponiveis?.find(w => w.nome === inimigo.arma_equipada);
@@ -304,14 +327,21 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       </div>
     </div>` : '';
 
-  const fasesListHtml = base?.fases?.length ? `
-    <div class="fases-list">
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">FASES</div>
-      ${base.fases.map(f => `
-        <div class="fase-item${f.id === inimigo.fase_atual ? ' ativa' : ''}">
-          <strong>${f.nome}</strong> (${f.gatilho}) — ${f.regra}
-        </div>`).join('')}
+  const tracosHtml = base?.tracos?.length ? `
+    <div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">TRAÇOS</div>
+      ${base.tracos.map(t => `<div class="acao-item"><span class="acao-nome">${t.nome}</span> — ${t.efeito}</div>`).join('')}
     </div>` : '';
+
+  // Resistências / imunidades — rodapé (consulta rara)
+  const resistenciasItens = base ? [
+    base.imunidades_dano?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Imune:</span>${base.imunidades_dano.join(', ')}</div>` : '',
+    base.resistencias_dano?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Resist:</span>${base.resistencias_dano.join(', ')}</div>` : '',
+    base.imunidades_condicao?.length ? `<div class="inimigo-stat"><span class="inimigo-stat-label">Imune cond:</span>${base.imunidades_condicao.join(', ')}</div>` : '',
+  ].filter(Boolean) : [];
+  const resistenciasHtml = resistenciasItens.length
+    ? `<div class="inimigo-resistencias">${resistenciasItens.join('')}</div>`
+    : '';
 
   const narrativaBtn = base?.narrativa
     ? `<button data-action="mostrar-narrativa" data-inimigo="${inimigo.id}" style="font-size:11px">Mostrar narrativa</button>`
@@ -333,11 +363,13 @@ function renderEnemyCard(card, inimigo, state, bestiario, expanded) {
       <button class="btn-remove-inimigo" data-action="remove-inimigo" data-inimigo="${inimigo.id}" data-direct="${isMorto}" aria-label="${removeTitle}" title="${removeTitle}">✕</button>
     </div>
     <div class="card-inimigo-body${isCollapsed ? ' collapsed' : ''}">
-      ${statsHtml}
-      ${tracosHtml}
+      ${combatInfoHtml}
+      ${atributosSavesHtml}
+      ${fasesListHtml}
       ${armaHtml}
       ${acoesHtml}
-      ${fasesListHtml}
+      ${tracosHtml}
+      ${resistenciasHtml}
       ${isBloodiedInimigo && faseAtual ? `<div style="color:var(--brasa);font-size:12px;border-left:2px solid var(--brasa);padding-left:6px">Fase atual: ${faseAtual.regra}</div>` : ''}
       <div>
         <label for="nota-${inimigo.id}" style="font-size:11px;color:var(--text-dim)">Nota:</label>
