@@ -112,7 +112,7 @@ Unifica três entradas que antes eram separadas (efeitos de equipamento, slots d
 equipamento, banco de itens). Tudo depende de um item modelado, então é uma épica só.
 **Começar por um único PC (Marin) como caso de teste antes de cadastrar todos.**
 
-### 1. Banco de itens — `itens.json` na raiz
+### 1. Banco de itens — `data/itens.json`
 
 Catálogo estático. **Modelar os itens reais do Marin revelou que "+N aditivo" não basta** —
 os efeitos se dividem em três naturezas, e só a primeira alimenta o recálculo amarelo/seta:

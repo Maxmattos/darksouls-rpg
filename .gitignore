@@ -2,9 +2,10 @@
 .idea/
 
 # PDFs com copyright (Steamforged Games) — não publicar
-DS RPG - EN.pdf
-DS RPG - PT.pdf
 *.pdf
+
+# Livros locais (PDFs/fichas) — não versionar
+livros/
 
 # Sistema operacional / editores
 .DS_Store

@@ -7,9 +7,9 @@ CONTEXTO DO PROJETO
 - Sistema base: Dark Souls RPG (Steamforged), reimpressão 2022 (versão
   corrigida — confirmado: copyright interno 2022, sem o bug do "paladin"
   como classe, Knight equipa o próprio kit consistentemente).
-- Fonte da verdade de regras: `Mecanicas.md` na raiz. SEMPRE consultar
+- Fonte da verdade de regras: `docs/Mecanicas.md`. SEMPRE consultar
   antes de responder qualquer dúvida de regra.
-- Ordem de prioridade em conflito: (1) Mecanicas.md, (2) livro EN
+- Ordem de prioridade em conflito: (1) docs/Mecanicas.md, (2) livro EN
   reimpresso, (3) errata/FAQ comunitário, (4) livro PT não-oficial.
 
 LORE HOMEBREW CENTRAL
@@ -22,7 +22,7 @@ LORE HOMEBREW CENTRAL
 - Elvyra — Cavaleira de Prata, serviu a Gwyn.
 - Dusk — esposa morta de Nish.
 
-HOUSERULES DISTINTIVAS (detalhe completo em Mecanicas.md)
+HOUSERULES DISTINTIVAS (detalhe completo em docs/Mecanicas.md)
 - Morte: contador individual 0–3. Ao morrer, larga almas como "marca de
   sangue" no local. Recuperar (1 ação) zera o contador. 3 mortes
   consecutivas sem recuperar = permadeath. A mesa NÃO usa Hollowing nem
@@ -30,7 +30,7 @@ HOUSERULES DISTINTIVAS (detalhe completo em Mecanicas.md)
 - Ataque não-visto fora de combate: crítico automático.
 - Parry HR pendente; em uso: RAW (+2 CA como reação).
 
-ARQUITETURA DO PAINEL (decisão já tomada — detalhe em spec_painel.md)
+ARQUITETURA DO PAINEL (decisão já tomada — detalhe em docs/spec_painel.md)
 - Um único `painel_mestre.html`, duas vistas via URL (`?view=master`
   e `?view=players`).
 - Sincronização entre janelas via `BroadcastChannel` API. Sem servidor.
@@ -38,15 +38,21 @@ ARQUITETURA DO PAINEL (decisão já tomada — detalhe em spec_painel.md)
 
 ESTRUTURA DE PASTAS
 - /Battle Maps           mapas táticos das sessões
-- /sessoes               roteiro de cada sessão
+- /sessoes               roteiro de cada sessão (sessao_0X.md, sessao_01/)
 - /trilha_sonora_rpg     playlists/cues
 - CLAUDE.md              este arquivo (harness do projeto)
-- Mecanicas.md           fonte da verdade de regras
-- spec_painel.md         spec do painel
-- spec_ideias_projeto.md backlog e itens pós-v1
-- painel_mestre.html     implementação do painel (a criar depois da spec)
-- DS RPG - EN.pdf        livro original (não versionado — copyright)
-- DS RPG - PT.pdf        tradução não-oficial (só pra conferir termos)
+- painel_mestre.html     implementação do painel
+- servir.sh / servir.bat sobem http.server na raiz
+- css/ js/               front do painel (JS puro, módulos ES)
+- data/                  bestiario.json, bloodied_origens.json, itens.json
+- docs/                  Mecanicas.md (regras), spec_painel.md, spec_ideias_projeto.md
+- img/itens/             arte dos itens (referenciada por data/itens.json)
+- imagens/               retratos de NPC/PC + prompts (binários fora do git)
+- livros/                DS RPG EN/PT.pdf, fichas — locais, fora do git (copyright)
+- ideias/                prep pessoal (fora do git)
+
+  Fonte da verdade de regras: `docs/Mecanicas.md`. Spec do painel:
+  `docs/spec_painel.md`. Backlog: `docs/spec_ideias_projeto.md`.
 
 CONVENÇÃO DE SESSÕES (a partir da Sessão 2): arquivos de sessão em
 `sessoes/sessao_0X.md` — plano, sem tema/duração/data no nome. Sessões
@@ -81,13 +87,13 @@ REGRAS DE OUTPUT (para você, agente)
 - Spec-driven: alterar comportamento começa pela spec, não pelo código.
 
 ESTADO ATUAL
-- Mecanicas.md consolidado. Pendências registradas no próprio arquivo
+- docs/Mecanicas.md consolidado. Pendências registradas no próprio arquivo
   (Encumbrance fino, Attunement slots por classe, Parry HR). Nenhuma
   bloqueia a sessão 1.
 - Git pessoal configurado via includeIf por diretório (isolado da
   identidade corporativa).
 - Repo público: github.com/Maxmattos/darksouls-rpg (branch main).
-- Próximo: implementar painel_mestre.html a partir de spec_painel.md
+- Próximo: implementar painel_mestre.html a partir de docs/spec_painel.md
   (branch feat/painel-mestre).
 - Sessão 1 (01/06/2026, ~2h): completados Ato 0–2; parou na fogueira antes
   do boss. Grupo ainda nível 1.

@@ -448,8 +448,8 @@ Badges de estado (Bloodied, marca de sangue, respawn) devem ser grandes e colori
 | Estado ausente | Inicia com os 4 PCs da campanha pré-populados (stats em §3) e os inimigos da sessão 1 pré-populados (3 Hollow Soldiers + Asylum Demon, refs em bestiario.json), combate inativo |
 | Exportar JSON | Botão sempre visível; download de blob com nome `rpg_ds_YYYY-MM-DD.json` |
 | Carregar JSON | Botão na vista mestre; abre input de arquivo; sobrescreve estado atual com confirmação |
-| Carga do bestiário | Na inicialização, painel faz fetch de `bestiario.json` (mesma pasta). Se falhar, exibe alerta e usa fallback vazio. Bestiário NÃO entra em localStorage — sempre lido do arquivo. |
-| Carga de bloodied_origens.json | Inicialização: fetch do JSON da mesma pasta. Falha exibe alerta; cards em Bloodied mostram só fundo laranja sem detalhe de efeitos. |
+| Carga do bestiário | Na inicialização, painel faz fetch de `data/bestiario.json`. Se falhar, exibe alerta e usa fallback vazio. Bestiário NÃO entra em localStorage — sempre lido do arquivo. |
+| Carga de bloodied_origens.json | Inicialização: fetch de `data/bloodied_origens.json`. Falha exibe alerta; cards em Bloodied mostram só fundo laranja sem detalhe de efeitos. |
 
 ---
 

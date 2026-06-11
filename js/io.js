@@ -3,7 +3,7 @@ let _channel = null;
 
 export async function loadBestiario() {
   try {
-    const r = await fetch('./bestiario.json');
+    const r = await fetch('./data/bestiario.json');
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
@@ -14,7 +14,7 @@ export async function loadBestiario() {
 
 export async function loadBloodiedOrigens() {
   try {
-    const r = await fetch('./bloodied_origens.json');
+    const r = await fetch('./data/bloodied_origens.json');
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
@@ -25,7 +25,7 @@ export async function loadBloodiedOrigens() {
 
 export async function loadItens() {
   try {
-    const r = await fetch('./itens.json');
+    const r = await fetch('./data/itens.json');
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
