@@ -1,0 +1,58 @@
+{
+  "pyromancer_robes": {
+    "nome": "Pyromancer Robes",
+    "slot": "armor",
+    "tipo": "armor",
+    "forca_min": null,
+    "imagem": "img/itens/pyromancer_robes.png",
+    "descricao": "Feitas das peles arrancadas das costas de criaturas hediondas, e bronze forjado para repelir o mal.",
+    "efeitos": [
+      { "alvo": "ac", "operacao": "set", "base": 12, "usa_mod": "des", "tipo": "sempre" }
+    ],
+    "especial": "Reduz qualquer dano de fogo recebido em 5, até o mínimo de 1."
+  },
+  "caduceus_round_shield": {
+    "nome": "Caduceus Round Shield",
+    "slot": "mao",
+    "tipo": "shield",
+    "forca_min": 10,
+    "imagem": "img/itens/caduceus_round_shield.png",
+    "descricao": "Pintado com o desenho de serpentes gêmeas, um dos antigos símbolos dos que habitavam o pântano.",
+    "efeitos": [
+      { "alvo": "ac", "operacao": "add", "valor": 1, "tipo": "sempre" }
+    ],
+    "especial": "1×/descanso longo, gaste 1 Position para rerolar um save de Destreza falho."
+  },
+  "club": {
+    "nome": "Club",
+    "slot": "mao",
+    "tipo": "weapon",
+    "forca_min": null,
+    "imagem": "img/itens/club.png",
+    "descricao": "Um porrete simples e contundente.",
+    "efeitos": [],
+    "perfil": {
+      "tipo_arma": "Hammer",
+      "dano": "1d4 contundente",
+      "alcance_m": 1.5,
+      "propriedades": ["Leve"]
+    },
+    "especial": "Gaste 3 Position após um acerto para soltar um grito de guerra. O alvo faz save de Sabedoria DC12 ou fica atordoado no próximo turno."
+  },
+  "pyromancers_flame": {
+    "nome": "Pyromancer's Flame",
+    "slot": "mao",
+    "tipo": "catalyst",
+    "forca_min": null,
+    "imagem": "img/itens/pyromancers_flame.png",
+    "descricao": "Catalisador de piromancias. Empunhá-lo permite conjurar.",
+    "efeitos": [],
+    "perfil": {
+      "tipo_arma": "Flame",
+      "dano": "—",
+      "alcance_m": null,
+      "propriedades": ["Leve"]
+    },
+    "especial": "Gaste 1 Position após um acerto corpo a corpo para causar +1d4 de dano de fogo."
+  }
+}
