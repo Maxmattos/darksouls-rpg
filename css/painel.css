@@ -583,6 +583,38 @@ textarea { resize: vertical; min-height: 48px; }
 .attr-arrow { color: var(--text-dim); margin: 0 2px; font-size: 0.85em; }
 .attr-new-val { color: var(--dourado); }
 
+/* Flash de mudança de AC por equipamento — mesmo ouro do Bloodied,
+   transitório, com seta de direção (↑ subiu / ↓ desceu). */
+@keyframes ac-flash {
+  0%   { color: var(--dourado); text-shadow: 0 0 10px var(--dourado); }
+  100% { color: inherit; text-shadow: none; }
+}
+.ac-flash { animation: ac-flash 1.4s ease-out; font-weight: bold; }
+.ac-flash .ac-dir { color: var(--dourado); }
+
+/* Slot equipado — vista jogadores */
+.pc-slot.filled { border-color: var(--dourado); background: var(--dourado-bg); }
+.pc-slot-item {
+  display: block;
+  font-size: 8px;
+  line-height: 1.05;
+  color: var(--dourado);
+  text-align: center;
+  padding: 2px;
+  overflow: hidden;
+}
+
+/* Seletor de item por slot — vista mestre */
+.pc-slot-select {
+  width: 100%;
+  font-size: 9px;
+  background: var(--bg-card-alt);
+  color: var(--text);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: 3px;
+  padding: 2px 1px;
+}
+
 /* ========================================================
    VISTA MESTRE — overrides compactos
    ======================================================== */

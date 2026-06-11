@@ -23,6 +23,17 @@ export async function loadBloodiedOrigens() {
   }
 }
 
+export async function loadItens() {
+  try {
+    const r = await fetch('./itens.json');
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch (e) {
+    console.warn('Falha ao carregar itens.json:', e);
+    return {};
+  }
+}
+
 export function initChannel() {
   if (typeof BroadcastChannel === 'undefined') return false;
   try {

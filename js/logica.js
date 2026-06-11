@@ -34,6 +34,28 @@ export function bloodiedEfeitos(pc, origens) {
   return { atributosDelta, acDelta, textos };
 }
 
+/* Motor de efeitos de itens. Função pura: estado do PC + itens já
+   resolvidos (objetos) → AC calculada. Ordem: set (armadura) define a
+   base; add (escudo, anéis) soma por cima. Itens sem efeitos não mexem. */
+export function calcularAC(pc, itensEquipados) {
+  const mods = pc.mods || {};
+  let base = pc.ac_base ?? 10;
+  for (const item of itensEquipados) {
+    for (const ef of item.efeitos || []) {
+      if (ef.alvo === 'ac' && ef.operacao === 'set') {
+        base = ef.base + (ef.usa_mod ? (mods[ef.usa_mod] || 0) : 0);
+      }
+    }
+  }
+  let total = base;
+  for (const item of itensEquipados) {
+    for (const ef of item.efeitos || []) {
+      if (ef.alvo === 'ac' && ef.operacao === 'add') total += ef.valor;
+    }
+  }
+  return total;
+}
+
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -104,6 +126,15 @@ function setPcField(state, { pcId, field, value }) {
   const pc = pcById(s, pcId);
   if (!pc) return s;
   pc[field] = value;
+  return s;
+}
+
+function setEquipSlot(state, { pcId, slot, itemId }) {
+  const s = deepClone(state);
+  const pc = pcById(s, pcId);
+  if (!pc) return s;
+  if (!pc.equipamento) pc.equipamento = {};
+  pc.equipamento[slot] = itemId || null;
   return s;
 }
 
@@ -217,6 +248,7 @@ export function aplicarAcao(state, action, payload) {
     case 'RETURN_TO_COMBAT':    return returnToCombat(state, payload);
     case 'DRINK_ESTUS':         return drinkEstus(state, payload);
     case 'SET_PC_FIELD':        return setPcField(state, payload);
+    case 'SET_EQUIP_SLOT':      return setEquipSlot(state, payload);
     case 'INIT_COMBAT':         return initCombat(state, payload);
     case 'END_COMBAT':          return endCombat(state);
     case 'SET_INIMIGO_FIELD':   return setInimigoField(state, payload);

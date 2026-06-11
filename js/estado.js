@@ -22,6 +22,7 @@ export function defaultState() {
         con_mod: 0,
         atributos: { str: 10, dex: 12, con: 10, int: 14, wis: 13, cha: 15 },
         ac_base: 11,
+        mods: { for: 0, des: 1, con: 0, int: 0, sab: 0, car: 0 },
         base_position: 7,
         position_atual: 7,
         estus_atual: 3,
@@ -44,6 +45,7 @@ export function defaultState() {
         con_mod: 2,
         atributos: { str: 12, dex: 15, con: 14, int: 13, wis: 10, cha: 10 },
         ac_base: 12,
+        mods: { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
         base_position: 11,
         position_atual: 11,
         estus_atual: 3,
@@ -66,6 +68,7 @@ export function defaultState() {
         con_mod: 2,
         atributos: { str: 15, dex: 10, con: 14, int: 10, wis: 12, cha: 13 },
         ac_base: 16,
+        mods: { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
         base_position: 13,
         position_atual: 13,
         estus_atual: 3,
@@ -88,6 +91,7 @@ export function defaultState() {
         con_mod: 2,
         atributos: { str: 16, dex: 10, con: 14, int: 10, wis: 12, cha: 14 },
         ac_base: 10,
+        mods: { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
         base_position: 13,
         position_atual: 13,
         estus_atual: 3,
@@ -118,8 +122,19 @@ function normalizeEquipamento(eq) {
   return { mao_esq: eq.mao_esq ?? null, mao_dir: eq.mao_dir ?? null, armor: eq.armor ?? null, anel_esq: eq.anel_esq ?? null, anel_dir: eq.anel_dir ?? null };
 }
 
+const ZERO_MODS = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
+
+function normalizePc(pc) {
+  // ac_base: estado antigo guardava AC em `ac`; sem nenhum, parte de 10.
+  const ac_base = pc.ac_base ?? pc.ac ?? 10;
+  // mods: default 0; Marin nasce com des +1 ao migrar (cobaia do motor).
+  let mods = { ...ZERO_MODS, ...(pc.mods || {}) };
+  if (pc.id === 'marin' && pc.mods === undefined) mods = { ...mods, des: 1 };
+  return { ...pc, ac_base, mods, equipamento: normalizeEquipamento(pc.equipamento) };
+}
+
 function normalizeState(s) {
-  if (s?.pcs) s.pcs = s.pcs.map(pc => ({ ...pc, equipamento: normalizeEquipamento(pc.equipamento) }));
+  if (s?.pcs) s.pcs = s.pcs.map(normalizePc);
   return s;
 }
 

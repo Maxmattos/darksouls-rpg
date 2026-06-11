@@ -1,9 +1,10 @@
-import { loadBestiario, loadBloodiedOrigens, initChannel, subscribe, publish, exportJSON, importJSON } from './io.js';
+import { loadBestiario, loadBloodiedOrigens, loadItens, initChannel, subscribe, publish, exportJSON, importJSON } from './io.js';
 import { defaultState, loadState, saveState, setState, getState, dispatch, setOnChange } from './estado.js';
 import { renderMaster, renderPlayers } from './render.js';
 
 let bestiario = {};
 let origens = {};
+let itens = {};
 let _view = 'master';
 
 /* Determine view from URL */
@@ -18,8 +19,8 @@ function showView(view) {
 }
 
 function render(state) {
-  if (_view === 'master') renderMaster(state, bestiario, origens);
-  else renderPlayers(state, origens);
+  if (_view === 'master') renderMaster(state, bestiario, origens, itens);
+  else renderPlayers(state, origens, itens);
 }
 
 /* ========================================================
@@ -31,6 +32,10 @@ function bindMasterListeners() {
   /* Delegação de eventos nos cards de PC */
   document.getElementById('pcs-grid').addEventListener('change', (e) => {
     const input = e.target;
+    if (input.dataset.action === 'set-slot') {
+      dispatch('SET_EQUIP_SLOT', { pcId: input.dataset.pc, slot: input.dataset.slot, itemId: input.value || null });
+      return;
+    }
     const pcId = input.dataset.pc;
     const field = input.dataset.field;
     if (!pcId || !field) return;
@@ -319,7 +324,7 @@ export async function init() {
   _view = detectView();
   showView(_view);
 
-  [bestiario, origens] = await Promise.all([loadBestiario(), loadBloodiedOrigens()]);
+  [bestiario, origens, itens] = await Promise.all([loadBestiario(), loadBloodiedOrigens(), loadItens()]);
 
   if (!bestiario || Object.keys(bestiario).length === 0) {
     console.warn('Bestiário vazio ou não carregado.');

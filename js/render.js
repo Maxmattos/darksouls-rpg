@@ -1,4 +1,4 @@
-import { isBloodied, bloodiedEfeitos } from './logica.js';
+import { isBloodied, bloodiedEfeitos, calcularAC } from './logica.js';
 
 const ATTR_LABELS = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
@@ -9,6 +9,26 @@ const SLOTS = [
   { key: 'anel_esq', label: 'ANEL ESQ' },
   { key: 'anel_dir', label: 'ANEL DIR' },
 ];
+
+// Que tipo de item (campo `slot` em itens.json) cada slot do PC aceita.
+const SLOT_ITEM_TYPE = { mao_esq: 'mao', mao_dir: 'mao', armor: 'armor', anel_esq: 'anel', anel_dir: 'anel' };
+
+// AC calculada anterior por PC, para detectar mudança e disparar o flash.
+const _prevAcByPc = new Map();
+
+function equippedItems(pc, itens) {
+  return Object.values(pc.equipamento || {}).filter(Boolean).map(id => itens?.[id]).filter(Boolean);
+}
+
+/* AC calculada + decisão de flash. Retorna a base calculada (sem o delta
+   de Bloodied) e a direção da mudança desde o último render, se houver. */
+function acComputo(pc, itens) {
+  const ac = calcularAC(pc, equippedItems(pc, itens));
+  const prev = _prevAcByPc.get(pc.id);
+  const mudou = prev != null && prev !== ac;
+  _prevAcByPc.set(pc.id, ac);
+  return { ac, dir: mudou ? (ac > prev ? 'up' : 'down') : null };
+}
 
 /* ---- Utilitários de DOM ---- */
 
@@ -47,12 +67,39 @@ function renderPcAttrCols(atributos, atributosDelta) {
   }).join('');
 }
 
-function renderSlotsHtml() {
-  return SLOTS.map(s => `
+function renderSlotsHtml(pc, itens) {
+  return SLOTS.map(s => {
+    const id = pc?.equipamento?.[s.key];
+    const item = id ? itens?.[id] : null;
+    return `
     <div class="pc-slot-wrap">
-      <div class="pc-slot"></div>
+      <div class="pc-slot${item ? ' filled' : ''}">${item ? `<span class="pc-slot-item">${item.nome}</span>` : ''}</div>
       <span class="pc-slot-label">${s.label}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+function renderSlotsMaster(pc, itens) {
+  return SLOTS.map(s => {
+    const tipo = SLOT_ITEM_TYPE[s.key];
+    const selId = pc?.equipamento?.[s.key] ?? '';
+    const opts = [`<option value="">—</option>`];
+    for (const [id, item] of Object.entries(itens || {})) {
+      if (item.slot !== tipo) continue;
+      opts.push(`<option value="${id}"${selId === id ? ' selected' : ''}>${item.nome}</option>`);
+    }
+    return `
+    <div class="pc-slot-wrap">
+      <select class="pc-slot-select" data-action="set-slot" data-pc="${pc.id}" data-slot="${s.key}">${opts.join('')}</select>
+      <span class="pc-slot-label">${s.label}</span>
+    </div>`;
+  }).join('');
+}
+
+// Display da AC com flash de equipamento (↑/↓) reaproveitando o ouro do Bloodied.
+function acFlashHtml(ac, dir) {
+  if (!dir) return `${ac}`;
+  return `<span class="ac-flash ac-flash-${dir}">${ac}<span class="attr-arrow ac-dir">${dir === 'up' ? '↑' : '↓'}</span></span>`;
 }
 
 function renderPortraitHtml(pc) {
@@ -69,7 +116,7 @@ function renderPips(mortes, cls) {
    VISTA MESTRE
    ======================================================== */
 
-export function renderMaster(state, bestiario, origens) {
+export function renderMaster(state, bestiario, origens, itens) {
   setText('session-data', state.sessao.data);
 
   const grid = document.getElementById('pcs-grid');
@@ -88,7 +135,7 @@ export function renderMaster(state, bestiario, origens) {
         card.className = 'card-pc';
         grid.appendChild(card);
       }
-      renderPcCardMaster(card, pc, state, origens);
+      renderPcCardMaster(card, pc, state, origens, itens);
     }
 
     state.pcs.forEach((pc, i) => {
@@ -101,14 +148,15 @@ export function renderMaster(state, bestiario, origens) {
   renderCombatBar(state);
 }
 
-function renderPcCardMaster(card, pc, state, origens) {
+function renderPcCardMaster(card, pc, state, origens, itens) {
   const blooded = isBloodied(pc, state.combate);
   const morto = pc.status === 'morto_aguardando_respawn';
 
   card.className = 'card-pc' + (blooded ? ' bloodied' : '') + (morto ? ' morto' : '');
 
   const efeitos = blooded ? bloodiedEfeitos(pc, origens) : { atributosDelta: {}, acDelta: 0, textos: [] };
-  const acEfetiva = (pc.ac_base ?? 10) + efeitos.acDelta;
+  const { ac: acCalc, dir: acDir } = acComputo(pc, itens);
+  const acEfetiva = acCalc + efeitos.acDelta;
   const poolTemp = state.combate.pool_inicial_combate[pc.id] ?? null;
 
   const positionTempHtml = (state.combate.ativo && poolTemp != null && poolTemp > 0)
@@ -116,8 +164,8 @@ function renderPcCardMaster(card, pc, state, origens) {
     : '';
 
   const acDisplay = efeitos.acDelta !== 0
-    ? `${pc.ac_base ?? 10}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
-    : `${acEfetiva}`;
+    ? `${acCalc}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
+    : acFlashHtml(acCalc, acDir);
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
@@ -194,7 +242,7 @@ function renderPcCardMaster(card, pc, state, origens) {
         ${btnRetornar}
       </div>
       <div class="pc-separator">◆</div>
-      <div class="pc-slots">${renderSlotsHtml()}</div>
+      <div class="pc-slots">${renderSlotsMaster(pc, itens)}</div>
       <div class="pc-effects">
         <div class="pc-effects-equip">
           <div class="pc-separator">◆</div>
@@ -405,7 +453,7 @@ function renderCombatBar(state) {
    VISTA JOGADORES
    ======================================================== */
 
-export function renderPlayers(state, origens) {
+export function renderPlayers(state, origens, itens) {
   const grid = document.getElementById('players-pcs-grid');
   if (!grid) return;
 
@@ -422,7 +470,7 @@ export function renderPlayers(state, origens) {
       card.dataset.pcId = pc.id;
       grid.appendChild(card);
     }
-    renderPcCardPlayers(card, pc, state, origens);
+    renderPcCardPlayers(card, pc, state, origens, itens);
   }
 
   state.pcs.forEach((pc, i) => {
@@ -431,7 +479,7 @@ export function renderPlayers(state, origens) {
   });
 }
 
-function renderPcCardPlayers(card, pc, state, origens) {
+function renderPcCardPlayers(card, pc, state, origens, itens) {
   const blooded = isBloodied(pc, state.combate);
   const morto = pc.status === 'morto_aguardando_respawn';
 
@@ -440,16 +488,16 @@ function renderPcCardPlayers(card, pc, state, origens) {
 
   const efeitos = blooded ? bloodiedEfeitos(pc, origens) : { atributosDelta: {}, acDelta: 0, textos: [] };
   const poolTemp = state.combate.pool_inicial_combate[pc.id] ?? null;
-  const acBase = pc.ac_base ?? 10;
-  const acEfetiva = acBase + efeitos.acDelta;
+  const { ac: acCalc, dir: acDir } = acComputo(pc, itens);
+  const acEfetiva = acCalc + efeitos.acDelta;
 
   const positionTempHtml = (state.combate.ativo && poolTemp != null && poolTemp > 0)
     ? `<span class="pc-vital-temp">+${poolTemp}</span>`
     : '';
 
   const acDisplay = efeitos.acDelta !== 0
-    ? `${acBase}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
-    : `${acEfetiva}`;
+    ? `${acCalc}<span class="attr-arrow">→</span><span class="attr-new-val">${acEfetiva}</span>`
+    : acFlashHtml(acCalc, acDir);
 
   const badgesHtml = [
     blooded ? `<span class="badge badge-bloodied">Bloodied</span>` : '',
@@ -476,7 +524,7 @@ function renderPcCardPlayers(card, pc, state, origens) {
     <div class="card-pc-inner">
       <div class="pc-card-left">
         <div class="pc-portrait">${renderPortraitHtml(pc)}</div>
-        <div class="pc-slots">${renderSlotsHtml()}</div>
+        <div class="pc-slots">${renderSlotsHtml(pc, itens)}</div>
       </div>
       <div class="pc-card-right">
         <div class="pc-nome">${pc.nome}</div>
